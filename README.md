@@ -30,6 +30,8 @@ I noticed that all of the small power bricks in my rack had 12VDC output.  Inste
 |[Switchcraft 761KSH15 2.5mm Locking Barrel Plug](https://www.mouser.com/ProductDetail/502-761KSH15) | 5 | [Datasheet](https://web.archive.org/web/20220407035117/https://www.mouser.com/datasheet/2/393/761KSH-S761KSH_CD-1110850.pdf). See bulletin above for electrical info.  For building DC cables out to devices. |
 |[14 AWG GXL Wire 10' Long](https://www.ebay.com/itm/293094627307) | 3 | 1 each: red, green, black.  Cut to length for high current DC wiring |
 |[DC Extension Cable 18 AWG 12VDC 10A 33' Long](https://www.ebay.com/itm/133233779533) | 1 | Connectors cut off and discarded; used to make output cables and for wiring inside Project Box |
+|[10pc Dupont 2x2 Female Housing](https://www.ebay.com/itm/141510327734) | 1 | 1 housing used to make ERDN40 alarm cable |
+|[10pc Dupont 2-pin 26AWG Female-Female Jumper Cable](https://www.ebay.com/itm/254959908608) | 1 | 2 cables used to make ERDN40 alarm cable |
 |[125pc Rubber Grommet Set](https://www.ebay.com/itm/221291687081) | 1 | 1 grommet used around wiring from ERDN40 into project box |
 |[TICONN 80pc Stainless Steel Hose Clamp Set](https://www.amazon.com/gp/product/B094YP2F3D) | 1 | 3 hose clamps used for AC cord strain relief |
 |[100pc 1/4" Aluminum Pop Rivet Set](https://www.harborfreight.com/100-piece-1-4-quarter-inch-aluminum-blind-rivet-set-67619.html) | 1 | 3 pop rivets used to secure hose clamps to shelf |
