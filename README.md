@@ -25,7 +25,8 @@ I noticed that all of the small power bricks in my rack had 12VDC output.  Inste
 |[Pinfox 10' 18 AWG 3 Prong Heavy Duty 120V 10A AC Cord](https://www.amazon.com/gp/product/B07QYRMD6D) | 2 | One AC cord for each MSP-200-12. |
 |[Raising Electronics 701401004 19" 1U 12" Deep Rack Shelf](https://www.amazon.com/gp/product/B01M8HKRA7) | 1 | [Product Page](https://web.archive.org/web/20220408132026/https://risingracks.com/cantilever-server-shelf-vented-black-shelves-rack-mount-19-1u-12-300mm-deep/) |
 |[10pc M3x6mm Plastic Pan Head Screw](https://www.ebay.com/itm/254913074827) | 1 | 10 screws used for mounting the Meanwell units to the shelf.  Plastic ensures no possibility of shorting. |
-|[10pc M3 Female-Female Standoff 25mm](https://www.ebay.com/itm/113410581076) | 1 | 4 standoffs used inside the project box to mount it to the shelf and secure the lid |
+|[10pc M3x25mm Female-Female Steel Standoff](https://www.ebay.com/itm/113410581076) | 1 | 4 standoffs used inside the project box to mount it to the shelf and secure the lid |
+|[25pc M3x8mm Pan Head Screw Steel Black](https://www.ebay.com/itm/111839544046) | 1 | 8 screws used with the 4 project box standoffs (2 screws per standoff) |
 |[Hammond 1591HSBK Project Box](https://www.mouser.com/ProductDetail/546-1591HS-BK) | 1 | [Datasheet](https://web.archive.org/web/20220407164638/https://www.mouser.com/datasheet/2/177/1591-1389824.pdf) |
 |[Switchcraft L712ASH 2.5mm Locking Barrel Socket](https://www.mouser.com/ProductDetail/502-L712ASH) | 5 | [Datasheet](https://web.archive.org/web/20220407035419/https://www.mouser.com/datasheet/2/393/L712ASH-L722ASH_CD-1110860.pdf), [Bulletin](https://web.archive.org/web/20220407164041/https://www.switchcraft.com/Documents/switchcraft_npb_637_high_temp_jacks_plugs.pdf).  Mounted on project box for DC outputs. |
 |[Switchcraft 761KSH15 2.5mm Locking Barrel Plug](https://www.mouser.com/ProductDetail/502-761KSH15) | 5 | [Datasheet](https://web.archive.org/web/20220407035117/https://www.mouser.com/datasheet/2/393/761KSH-S761KSH_CD-1110850.pdf). See bulletin above for electrical info.  For building DC cables out to devices. |
@@ -36,7 +37,7 @@ I noticed that all of the small power bricks in my rack had 12VDC output.  Inste
 |[125pc Rubber Grommet Set](https://www.ebay.com/itm/221291687081) | 1 | 1 grommet used around wiring from ERDN40 into project box |
 |[TICONN 80pc Stainless Steel Hose Clamp Set](https://www.amazon.com/gp/product/B094YP2F3D) | 1 | 3 hose clamps used for AC cord strain relief |
 |[100pc 1/4" Aluminum Pop Rivet Set](https://www.harborfreight.com/100-piece-1-4-quarter-inch-aluminum-blind-rivet-set-67619.html) | 1 | 3 pop rivets used to secure hose clamps to shelf |
-|[6pc Phoneix Contact Cable Tie Mount Base](https://www.mouser.com/ProductDetail/651-3240709) | 1 | 3 bases used for cable management |
+|[6pc Phoenix Contact Cable Tie Mount Base](https://www.mouser.com/ProductDetail/651-3240709) | 1 | 3 bases used for cable management |
 |[Panduit Cable Tie Assortment](https://www.mouser.com/ProductDetail/644-KB-550) | 1 | 3 ties used for cable management |
 |[42pc Marine Heat Shrink Tubing](https://www.harborfreight.com/42-piece-marine-heat-shrink-tubing-67598.html) | 1 | For insulating cable ends and also cable management |
 
