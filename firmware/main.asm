@@ -2,8 +2,8 @@
 ;1 VCC
 ;2 PA6 TX -> MAX232CPE  T1IN 11 -> T1OUT 14 -> DB9 TX 2
 ;3 PA7 RX <- MAX232CPE R1OUT 12 <-  R1IN 13 <- DB9 RX 3
-;4 PA1 <- Power Supply 0 status (0=OK, 1=fail)
-;5 PA2 <- Power Supply 1 status (0=OK, 1=fail)
+;4 PA1 <- Power Supply 0 status (0=fail, 1=ok)
+;5 PA2 <- Power Supply 1 status (0=fail, 1=ok)
 ;6 UPDI
 ;7 EXTCLK
 ;8 GND    -> DB9 GND 5
@@ -12,8 +12,8 @@
 
     .include "tn212def.asm"
 
-ps0 = SRAM_START+0  ;Power Supply 0 status (0=OK, nonzero=fail)
-ps1 = SRAM_START+1  ;Power Supply 1 status (0=OK, nonzero=fail)
+ps0_ok = SRAM_START+0  ;Power Supply 0 ok status (0=fail, 1=ok)
+ps1_ok = SRAM_START+1  ;Power Supply 1 ok status (0=fail, 1=ok)
 
     .org PROGMEM_START
 
@@ -47,13 +47,13 @@ reset:
     rcall uart_init
 
 loop:
-    rcall check_supplies
-
     rcall uart_chrin
     cpi r16, '\r            ;received '\r'?
     brne loop               ;no: ignore and wait for next char
 
-    ;send status like "PS0=OK,PS1=OK\r\n"
+    rcall check_supplies
+
+    ;send status like "ps0_ok=OK,ps1_ok=OK\r\n"
     rcall send_ps0_status
     ldi r16, ',
     rcall uart_chrout
@@ -66,7 +66,7 @@ loop:
     rjmp loop
 
 ;Check power supplies 0 and 1
-;Store statuses in ps0 and ps1
+;Store statuses in ps0_ok and ps1_ok
 ;Destroys R16,R17
 check_supplies:
     lds r16, PORTA_IN       ;Read once
@@ -84,26 +84,26 @@ check_supplies:
 
     lsr r16                 ;Rotate PA1 (Power Supply 1) into bit 0
     andi r16, #1            ;Mask off PA2
-    sts ps0,r16             ;Store as Power Supply 0 state
+    sts ps0_ok,r16          ;Store as Power Supply 0 ok status (0=fail, 1=ok)
 
     lsr r17                 ;Rotate PA2 (Power Supply 1) into bit 0
     lsr r17
-    sts ps1,r17             ;Store as Power Supply 1 state
+    sts ps1_ok,r17          ;Store as Power Supply 1 ok status (0=fail, 1=ok)
     ret
 
 send_ps0_status:
     ldi r16, 0
-    lds r17, ps0
+    lds r17, ps0_ok
     rjmp send_ps_status
 
 send_ps1_status:
     ldi r16, 1
-    lds r17, ps1
+    lds r17, ps1_ok
     ;fall through
 
 ;Send "PSn=OK" or "PSn=FAIL"
 ;R16=power supply number (0-1)
-;R17=status (0=ok, 1=fail)
+;R17=status (0=fail, 1=ok)
 send_ps_status:
     push r17            ;push status
     push r16            ;push power supply number
@@ -122,17 +122,11 @@ send_ps_status:
     rcall send_ok_fail  ;send "OK" if 0, else send "FAIL"
     ret
 
-;Send "OK" if R16=0, else send "FAIL"
+;Send "OK" if R16=1, else send "FAIL"
 ;Destroys R16
 send_ok_fail:
-    cpi r16, 0
-    brne send_fail
-    ldi r16, 'O
-    rcall uart_chrout
-    ldi r16, 'K
-    rcall uart_chrout
-    ret
-send_fail:
+    cpi r16, 1
+    breq send_ok
     ldi r16, 'F
     rcall uart_chrout
     ldi r16, 'A
@@ -140,6 +134,12 @@ send_fail:
     ldi r16, 'I
     rcall uart_chrout
     ldi r16, 'L
+    rcall uart_chrout
+    ret
+send_ok:
+    ldi r16, 'O
+    rcall uart_chrout
+    ldi r16, 'K
     rcall uart_chrout
     ret
 
