@@ -12,6 +12,9 @@
 
     .include "tn212def.asm"
 
+ps0 = SRAM_START+0  ;Power Supply 0 status (0=OK, nonzero=fail)
+ps1 = SRAM_START+1  ;Power Supply 1 status (0=OK, nonzero=fail)
+
     .org PROGMEM_START
     rjmp reset
 
@@ -39,24 +42,17 @@ main:
     rcall uart_init
 
 loop:
+    rcall check_supplies
+
     rcall uart_chrin
     cpi r16, '\r            ;received '\r'?
     brne loop               ;no: ignore and wait for next char
 
-    ;received '\r'
     ;send status like "PS0=OK,PS1=OK\r\n"
-
-    ldi r16, 0              ;power supply 0
-    rcall check_ps          ;check it
-    rcall send_ps_status    ;print "PS0=OK" or "PS0=FAIL"
-
+    rcall send_ps0_status
     ldi r16, ',
     rcall uart_chrout
-
-    ldi r16, 1              ;power supply 1
-    rcall check_ps          ;check it
-    rcall send_ps_status    ;print "PS1=OK" or "PS1=FAIL"
-
+    rcall send_ps1_status
     ldi r16, '\r
     rcall uart_chrout
     ldi r16, '\n
@@ -64,16 +60,26 @@ loop:
 
     rjmp loop
 
-;Check if a power supply is up or down
-;R16=power supply number (0-1)
-;Preserves R16
-;Returns status in R17 (0=ok,1=fail)
-check_ps:
-    push r16
+;Check power supplies 0 and 1
+;Store statuses in ps0 and ps1
+;Destroys R16
+check_supplies:
     rcall delay_25ms
-    pop r16
-    ldi r17, 0
+    ldi r16, 0
+    sts ps0, r16
+    ldi r16, 1
+    sts ps1, r16
     ret
+
+send_ps0_status:
+    ldi r16, 0
+    lds r17, ps0
+    rjmp send_ps_status
+
+send_ps1_status:
+    ldi r16, 1
+    lds r17, ps1
+    ;fall through
 
 ;Send "PSn=OK" or "PSn=FAIL"
 ;R16=power supply number (0-1)
@@ -93,15 +99,20 @@ send_ps_status:
     rcall uart_chrout
 
     pop r16             ;pop status
-    cpi r16, 0
-    brne fail           ;branch if status is not ok
+    rcall send_ok_fail  ;send "OK" if 0, else send "FAIL"
+    ret
 
+;Send "OK" if R16=0, else send "FAIL"
+;Destroys R16
+send_ok_fail:
+    cpi r16, 0
+    brne send_fail
     ldi r16, 'O
     rcall uart_chrout
     ldi r16, 'K
     rcall uart_chrout
     ret
-fail:
+send_fail:
     ldi r16, 'F
     rcall uart_chrout
     ldi r16, 'A
