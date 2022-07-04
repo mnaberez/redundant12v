@@ -2,8 +2,8 @@
 ;1 VCC
 ;2 PA6 TX -> MAX232CPE  T1IN 11 -> T1OUT 14 -> DB9 TX 2
 ;3 PA7 RX <- MAX232CPE R1OUT 12 <-  R1IN 13 <- DB9 RX 3
-;4 PA1
-;5 PA2
+;4 PA1 <- Power Supply 0 status (0=OK, 1=fail)
+;5 PA2 <- Power Supply 1 status (0=OK, 1=fail)
 ;6 UPDI
 ;7 EXTCLK
 ;8 GND    -> DB9 GND 5
@@ -16,9 +16,14 @@ ps0 = SRAM_START+0  ;Power Supply 0 status (0=OK, nonzero=fail)
 ps1 = SRAM_START+1  ;Power Supply 1 status (0=OK, nonzero=fail)
 
     .org PROGMEM_START
-    rjmp reset
 
-    .org PROGMEM_START+INT_VECTORS_SIZE
+    ;All vectors jump to reset (this program does not use interrupts)
+    .rept INT_VECTORS_SIZE
+    rjmp reset
+    .endm
+
+    ;Code starts at first location after vectors
+    .assume . - (PROGMEM_START + INT_VECTORS_SIZE)
 
 reset:
   	;Initialize stack pointer
@@ -38,7 +43,7 @@ reset:
   	sts CPU_CCP, r17					        ;Unlock Protected I/O Registers
   	sts CLKCTRL_MCLKCTRLA, r16			  ;Use EXTCLK for main clock
 
-main:
+    rcall gpio_init
     rcall uart_init
 
 loop:
@@ -62,13 +67,28 @@ loop:
 
 ;Check power supplies 0 and 1
 ;Store statuses in ps0 and ps1
-;Destroys R16
+;Destroys R16,R17
 check_supplies:
-    rcall delay_25ms
-    ldi r16, 0
-    sts ps0, r16
-    ldi r16, 1
-    sts ps1, r16
+    lds r16, PORTA_IN       ;Read once
+    andi r16, 0b00000110    ;PA2=Power Supply 0, PA1=Power Supply 1
+
+    push r16
+    rcall delay_25ms        ;Delay 25ms to debounce
+    pop r16
+
+    lds r17, PORTA_IN       ;Read again
+    andi r17, 0b00000110
+
+    cp r16, r17
+    brne check_supplies     ;Loop until both reads are equal
+
+    lsr r16                 ;Rotate PA1 (Power Supply 1) into bit 0
+    andi r16, #1            ;Mask off PA2
+    sts ps0,r16             ;Store as Power Supply 0 state
+
+    lsr r17                 ;Rotate PA2 (Power Supply 1) into bit 0
+    lsr r17
+    sts ps1,r17             ;Store as Power Supply 1 state
     ret
 
 send_ps0_status:
@@ -121,6 +141,12 @@ send_fail:
     rcall uart_chrout
     ldi r16, 'L
     rcall uart_chrout
+    ret
+
+gpio_init:
+    lds r16, PORTA_base + PORT_DIR_offset
+    andi r16, 0b11111001 ;pa2, pa1 = input
+    sts PORTA_base + PORT_DIR_offset, r16
     ret
 
 uart_init:
