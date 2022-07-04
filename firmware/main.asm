@@ -40,9 +40,77 @@ main:
 
 loop:
     rcall uart_chrin
+    cpi r16, '\r            ;received '\r'?
+    brne loop               ;no: ignore and wait for next char
+
+    ;received '\r'
+    ;send status like "PS0=OK,PS1=OK\r\n"
+
+    ldi r16, 0              ;power supply 0
+    rcall check_ps          ;check it
+    rcall send_ps_status    ;print "PS0=OK" or "PS0=FAIL"
+
+    ldi r16, ',
     rcall uart_chrout
+
+    ldi r16, 1              ;power supply 1
+    rcall check_ps          ;check it
+    rcall send_ps_status    ;print "PS1=OK" or "PS1=FAIL"
+
+    ldi r16, '\r
+    rcall uart_chrout
+    ldi r16, '\n
+    rcall uart_chrout
+
     rjmp loop
 
+;Check if a power supply is up or down
+;R16=power supply number (0-1)
+;Preserves R16
+;Returns status in R17 (0=ok,1=fail)
+check_ps:
+    push r16
+    rcall delay_25ms
+    pop r16
+    ldi r17, 0
+    ret
+
+;Send "PSn=OK" or "PSn=FAIL"
+;R16=power supply number (0-1)
+;R17=status (0=ok, 1=fail)
+send_ps_status:
+    push r17            ;push status
+    push r16            ;push power supply number
+
+    ldi r16, 'P
+    rcall uart_chrout
+    ldi r16, 'S
+    rcall uart_chrout
+    pop r16             ;pop power supply number
+    ori r16, 0x30       ;convert to ascii
+    rcall uart_chrout
+    ldi r16, '=
+    rcall uart_chrout
+
+    pop r16             ;pop status
+    cpi r16, 0
+    brne fail           ;branch if status is not ok
+
+    ldi r16, 'O
+    rcall uart_chrout
+    ldi r16, 'K
+    rcall uart_chrout
+    ret
+fail:
+    ldi r16, 'F
+    rcall uart_chrout
+    ldi r16, 'A
+    rcall uart_chrout
+    ldi r16, 'I
+    rcall uart_chrout
+    ldi r16, 'L
+    rcall uart_chrout
+    ret
 
 uart_init:
     ;#define F_CPU 1843200
@@ -94,6 +162,16 @@ uart_chrout:
     ret
 
 
+;Wait 25ms.  Destroys R16-R18
+delay_25ms:
+    ldi r18, 25
+wait3:
+    rcall delay_1ms
+    dec r18
+    brne wait3
+    ret
+
+;Wait 1ms.  Destroy R16-R17
 delay_1ms:
     ldi r16, 6
 wait2:
