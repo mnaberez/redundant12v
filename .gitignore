@@ -1,1 +1,4 @@
 out.*
+*-backups/
+fp-info-cache
+
