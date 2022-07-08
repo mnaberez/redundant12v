@@ -67,25 +67,36 @@ loop:
 
 ;Check power supplies 0 and 1
 ;Store statuses in ps0_ok and ps1_ok
-;Destroys R16,R17
+;Blocks for at least 25ms to debounce
+;Destroys R16,R17,R18
 check_supplies:
+    ldi r18, 25             ;Debounce: PORTA must be the same for N readings
+
+1$:
     lds r16, PORTA_IN       ;Read once
     andi r16, 0b00000110    ;PA2=Power Supply 0, PA1=Power Supply 1
 
     push r16
-    rcall delay_25ms        ;Delay 25ms to debounce
+    rcall delay_1ms         ;Delay 1ms
     pop r16
 
     lds r17, PORTA_IN       ;Read again
     andi r17, 0b00000110
 
     cp r16, r17
-    brne check_supplies     ;Loop until both reads are equal
+    brne check_supplies     ;Start over if readings are different
 
+    dec r18
+    brne 1$                 ;Loop until all required readings are the same
+
+    ;R16 and R17 both contain the debounced and masked PORTA
+
+    ;Set ps0_ok from R16
     lsr r16                 ;Rotate PA1 (Power Supply 1) into bit 0
     andi r16, #1            ;Mask off PA2
     sts ps0_ok,r16          ;Store as Power Supply 0 ok status (0=fail, 1=ok)
 
+    ;Set ps1_ok from R17
     lsr r17                 ;Rotate PA2 (Power Supply 1) into bit 0
     lsr r17
     sts ps1_ok,r17          ;Store as Power Supply 1 ok status (0=fail, 1=ok)
@@ -126,7 +137,8 @@ send_ps_status:
 ;Destroys R16
 send_ok_fail:
     cpi r16, 1
-    breq send_ok
+    breq 1$
+
     ldi r16, 'F
     rcall uart_chrout
     ldi r16, 'A
@@ -136,7 +148,8 @@ send_ok_fail:
     ldi r16, 'L
     rcall uart_chrout
     ret
-send_ok:
+
+1$:
     ldi r16, 'O
     rcall uart_chrout
     ldi r16, 'K
@@ -199,23 +212,14 @@ uart_chrout:
     ret
 
 
-;Wait 25ms.  Destroys R16-R18
-delay_25ms:
-    ldi r18, 25
-wait3:
-    rcall delay_1ms
-    dec r18
-    brne wait3
-    ret
-
-;Wait 1ms.  Destroy R16-R17
+;Wait 1ms.  Destroy R16,R17
 delay_1ms:
     ldi r16, 6
-wait2:
+1$:
     ldi r17, 0xc5
-wait:
+2$:
     dec r17 ; Decrement r17
-    brne wait ; Branch if r17<>0
+    brne 2$ ; Branch if r17<>0
     dec r16
-    brne wait2
+    brne 1$
     ret
