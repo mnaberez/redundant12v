@@ -46,24 +46,35 @@ reset:
     rcall gpio_init
     rcall uart_init
 
-loop:
-    rcall uart_chrin
-    cpi r16, '\r            ;received '\r'?
-    brne loop               ;no: ignore and wait for next char
+1$:
+    rcall uart_has_error      ;UART error occured?
+    brcs 2$                   ;Branch if error
+
+    rcall uart_has_byte       ;Byte received?
+    brcc 1$                   ;No: keep waiting
+
+    rcall uart_read_byte
+    cpi r16, '\r              ;Byte received = '\r'?
+    brne 1$                   ;No: keep waiting
 
     rcall check_supplies
 
-    ;send status like "ps0_ok=OK,ps1_ok=OK\r\n"
+    ;send status like "PS0=OK,PS1=OK\r\n"
     rcall send_ps0_status
     ldi r16, ',
-    rcall uart_chrout
+    rcall uart_send_byte
     rcall send_ps1_status
     ldi r16, '\r
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, '\n
-    rcall uart_chrout
+    rcall uart_send_byte
 
-    rjmp loop
+    rjmp 1$
+
+2$:
+    rcall uart_clear_error    ;Clear the UART error
+    rjmp 1$
+
 
 ;Check power supplies 0 and 1
 ;Store statuses in ps0_ok and ps1_ok
@@ -120,14 +131,14 @@ send_ps_status:
     push r16            ;push power supply number
 
     ldi r16, 'P
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, 'S
-    rcall uart_chrout
+    rcall uart_send_byte
     pop r16             ;pop power supply number
     ori r16, 0x30       ;convert to ascii
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, '=
-    rcall uart_chrout
+    rcall uart_send_byte
 
     pop r16             ;pop status
     rcall send_ok_fail  ;send "OK" if 0, else send "FAIL"
@@ -140,20 +151,20 @@ send_ok_fail:
     breq 1$
 
     ldi r16, 'F
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, 'A
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, 'I
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, 'L
-    rcall uart_chrout
+    rcall uart_send_byte
     ret
 
 1$:
     ldi r16, 'O
-    rcall uart_chrout
+    rcall uart_send_byte
     ldi r16, 'K
-    rcall uart_chrout
+    rcall uart_send_byte
     ret
 
 gpio_init:
@@ -191,26 +202,50 @@ uart_init:
     sts USART0_CTRLB, r16
     ret
 
+;Check if one of the UART error flags is set
+;Sets carry on error
+uart_has_error:
+    clc
+    lds r16, USART0_RXDATAH
+    andi r16, USART_BUFOVF_bm | USART_FERR_bm | USART_PERR_bm
+    breq 1$
+    sec
+1$:
+    ret
 
-uart_chrin:
-    ;while (!(USART0.STATUS & USART_RXCIF_bm)) {}
-    lds r16, USART0_STATUS
-    sbrs r16, USART_RXCIF_bp
-    rjmp uart_chrin
-    ;return USART0.RXDATAL;
+;Clear the UART error status bits
+uart_clear_error:
+    lds r16, USART0_RXDATAH
     lds r16, USART0_RXDATAL
     ret
 
+;Check if a byte has been received from the UART
+;Sets carry if one is available
+uart_has_byte:
+    clc
+    lds r16, USART0_STATUS
+    sbrc r16, USART_RXCIF_bp    ;Skip setting carry if no char received
+    sec
+    ret
 
-uart_chrout:
+;Read a byte from the UART
+;Blocks until a byte has been received
+uart_read_byte:
+    rcall uart_has_byte
+    brcc uart_read_byte
+    lds r16, USART0_RXDATAL
+    ret
+
+;Write a byte to the UART
+;Blocks until the UART accepts the byte
+uart_send_byte:
     ;while (!(USART0.STATUS & USART_DREIF_bm)) {}
     lds r17, USART0_STATUS
     sbrs r17, USART_DREIF_bp
-    rjmp uart_chrout
+    rjmp uart_send_byte
     ;USART0.TXDATAL = c;
     sts USART0_TXDATAL, r16
     ret
-
 
 ;Wait 1ms.  Destroy R16,R17
 delay_1ms:
