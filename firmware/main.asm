@@ -9,6 +9,7 @@
 ;8 GND    -> DB9 GND 5
 
     .area code (abs)
+    .list (me)
 
     .include "tn212def.asm"
 
