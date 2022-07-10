@@ -47,34 +47,24 @@ reset:
     rcall gpio_init
     rcall uart_init
 
-1$:
+main_loop:
     rcall uart_has_error      ;UART error occured?
-    brcs 2$                   ;Branch if error
+    brcs error                ;Branch if error
 
     rcall uart_has_byte       ;Byte received?
-    brcc 1$                   ;No: keep waiting
+    brcc main_loop            ;No: keep waiting
 
     rcall uart_read_byte
     cpi r16, '\r              ;Byte received = '\r'?
-    brne 1$                   ;No: keep waiting
+    brne main_loop            ;No: keep waiting
 
     rcall check_supplies
+    rcall send_status_line
+    rjmp main_loop
 
-    ;send status like "PS0=OK,PS1=OK\r\n"
-    rcall send_ps0_status
-    ldi r16, ',
-    rcall uart_send_byte
-    rcall send_ps1_status
-    ldi r16, '\r
-    rcall uart_send_byte
-    ldi r16, '\n
-    rcall uart_send_byte
-
-    rjmp 1$
-
-2$:
+error:
     rcall uart_clear_error    ;Clear the UART error
-    rjmp 1$
+    rjmp main_loop
 
 
 ;Check power supplies 0 and 1
@@ -114,59 +104,61 @@ check_supplies:
     sts ps1_ok,r17          ;Store as Power Supply 1 ok status (0=fail, 1=ok)
     ret
 
-send_ps0_status:
-    ldi r16, 0
-    lds r17, ps0_ok
-    rjmp send_ps_status
+;Send status like like "PS0=OK,PS1=OK\r\n"
+send_status_line:
+    ldi r16, 0              ;Supply number
+    lds r17, ps0_ok         ;Supply status
+    rcall send_ps_status
 
-send_ps1_status:
-    ldi r16, 1
-    lds r17, ps1_ok
-    ;fall through
+    ldi r16, ',
+    rcall uart_send_byte
+
+    ldi r16, 1              ;Supply number
+    lds r17, ps1_ok         ;Supply status
+    rcall send_ps_status
+
+    rjmp uart_send_crlf
 
 ;Send "PSn=OK" or "PSn=FAIL"
 ;R16=power supply number (0-1)
 ;R17=status (0=fail, 1=ok)
 send_ps_status:
-    push r17            ;push status
-    push r16            ;push power supply number
+    push r17              ;Push status
+    push r16              ;Push power supply number
 
-    ldi r16, 'P
-    rcall uart_send_byte
-    ldi r16, 'S
-    rcall uart_send_byte
-    pop r16             ;pop power supply number
-    ori r16, 0x30       ;convert to ascii
-    rcall uart_send_byte
-    ldi r16, '=
+    ldi ZL, <(ps * 2)
+    ldi ZH, >(ps * 2)
+    rcall uart_send_str   ;Send "PS"
+
+    pop r16               ;Pop power supply number
+    ori r16, 0x30         ;Convert to ascii
     rcall uart_send_byte
 
-    pop r16             ;pop status
-    rcall send_ok_fail  ;send "OK" if 0, else send "FAIL"
-    ret
-
-;Send "OK" if R16=1, else send "FAIL"
-;Destroys R16
-send_ok_fail:
+    pop r16               ;Pop status
     cpi r16, 1
-    breq 1$
+    breq 1$               ;Branch if OK
 
-    ldi r16, 'F
-    rcall uart_send_byte
-    ldi r16, 'A
-    rcall uart_send_byte
-    ldi r16, 'I
-    rcall uart_send_byte
-    ldi r16, 'L
-    rcall uart_send_byte
-    ret
+    ldi ZL, <(equals_fail * 2)
+    ldi ZH, >(equals_fail * 2)
+    rjmp uart_send_str    ;Send "=FAIL"
 
 1$:
-    ldi r16, 'O
-    rcall uart_send_byte
-    ldi r16, 'K
-    rcall uart_send_byte
-    ret
+    ;Send "=OK"
+    ldi ZL, <(equals_ok * 2)
+    ldi ZH, >(equals_ok * 2)
+    rjmp uart_send_str    ;Send "=OK"
+
+.nval ps,.
+    .ascii "PS"
+    .byte 0
+
+.nval equals_fail,.
+    .ascii "=FAIL"
+    .byte 0
+
+.nval equals_ok,.
+    .ascii "=OK"
+    .byte 0
 
 gpio_init:
     lds r16, PORTA_base + PORT_DIR_offset
@@ -239,6 +231,7 @@ uart_read_byte:
 
 ;Write a byte to the UART
 ;Blocks until the UART accepts the byte
+;Destroys R17
 uart_send_byte:
     ;while (!(USART0.STATUS & USART_DREIF_bm)) {}
     lds r17, USART0_STATUS
@@ -247,6 +240,30 @@ uart_send_byte:
     ;USART0.TXDATAL = c;
     sts USART0_TXDATAL, r16
     ret
+
+;Send CRLF to the UART.
+;Destroys R16
+uart_send_crlf:
+    ldi r16, '\r
+    rcall uart_send_byte
+    ldi r16, '\n
+    rjmp uart_send_byte
+
+;Send a null-terminated string to the UART
+;Destroys R16 and Z
+uart_send_str:
+1$: lpm r16, Z            ;Read byte from string
+    cpi r16, 0
+    breq 2$               ;Branch if end of string
+    rcall uart_send_byte
+
+    ldi r16, 1            ;Increment to next byte
+    add ZL, r16
+    clr r16
+    adc ZH, r16
+    rjmp 1$
+2$: ret
+
 
 ;Wait 1ms.  Destroy R16,R17
 delay_1ms:

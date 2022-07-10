@@ -4265,13 +4265,12 @@ WDT_WINDOW_8KCLK_gc = (0x0B<<4)     ; 8K cycles (8.2s)
 
 ; ***** CPU REGISTER DEFINITIONS *****************************************
 
-;TODO
-;XH	= r27
-;XL	= r26
-;YH	= r29
-;YL	= r28
-;ZH	= r31
-;ZL	= r30
+XH	= 27
+XL	= 26
+YH	= 29
+YL	= 28
+ZH	= 31
+ZL	= 30
 
 
 ; ***** DATA MEMORY DECLARATIONS *****************************************
