@@ -13,8 +13,11 @@
 
     .include "tn212def.asm"
 
-ps0_ok = SRAM_START+0  ;Power Supply 0 ok status (0=fail, 1=ok)
-ps1_ok = SRAM_START+1  ;Power Supply 1 ok status (0=fail, 1=ok)
+ram = SRAM_START
+supplies = ram+0x00   ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
+                      ;Bit 7..2 Unused
+                      ;Bit    1 Power Supply 1
+                      ;Bit    0 Power Supply 0
 
     .org PROGMEM_START
 
@@ -58,7 +61,7 @@ main_loop:
     cpi r16, '\r              ;Byte received = '\r'?
     brne main_loop            ;No: keep waiting
 
-    rcall check_supplies
+    rcall update_supplies
     rcall send_status_line
     rjmp main_loop
 
@@ -67,16 +70,15 @@ error:
     rjmp main_loop
 
 
-;Check power supplies 0 and 1
-;Store statuses in ps0_ok and ps1_ok
+;Check power supplies 0 and 1 and update "supplies" bitfield
 ;Blocks for at least 25ms to debounce
 ;Destroys R16,R17,R18
-check_supplies:
+update_supplies:
     ldi r18, 25             ;Debounce: PORTA must be the same for N readings
 
 1$:
     lds r16, PORTA_IN       ;Read once
-    andi r16, 0b00000110    ;PA2=Power Supply 0, PA1=Power Supply 1
+    andi r16, 0b00000110    ;PA2=Power Supply 1, PA1=Power Supply 0
 
     push r16
     rcall delay_1ms         ;Delay 1ms
@@ -86,41 +88,36 @@ check_supplies:
     andi r17, 0b00000110
 
     cp r16, r17
-    brne check_supplies     ;Start over if readings are different
+    brne update_supplies    ;Start over if readings are different
 
     dec r18
     brne 1$                 ;Loop until all required readings are the same
 
     ;R16 and R17 both contain the debounced and masked PORTA
 
-    ;Set ps0_ok from R16
-    lsr r16                 ;Rotate PA1 (Power Supply 1) into bit 0
-    andi r16, #1            ;Mask off PA2
-    sts ps0_ok,r16          ;Store as Power Supply 0 ok status (0=fail, 1=ok)
-
-    ;Set ps1_ok from R17
-    lsr r17                 ;Rotate PA2 (Power Supply 1) into bit 0
-    lsr r17
-    sts ps1_ok,r17          ;Store as Power Supply 1 ok status (0=fail, 1=ok)
+    lsr r16                 ;Rotate right once so bit 1 = Supply 1, bit 0 = Supply 0
+    sts supplies,r16        ;Store as new supplies status
     ret
 
 ;Send status like like "PS0=OK,PS1=OK\r\n"
 send_status_line:
-    ldi r16, 0              ;Supply number
-    lds r17, ps0_ok         ;Supply status
+    ldi r16, '0             ;Supply number to display in ASCII = '0'
+    lds r17, supplies       ;Get supplies bitfield
+    andi r17, 1             ;Mask off to leave only bit 0 (supply 0 status)
     rcall send_ps_status
 
     ldi r16, ',
     rcall uart_send_byte
 
-    ldi r16, 1              ;Supply number
-    lds r17, ps1_ok         ;Supply status
+    ldi r16, '1             ;Supply number to display in ASCII = '1'
+    lds r17, supplies       ;Get supplies bitfield
+    lsr r17                 ;Rotate bit 0 (supply 1 status) into bit 0
     rcall send_ps_status
 
     rjmp uart_send_crlf
 
 ;Send "PSn=OK" or "PSn=FAIL"
-;R16=power supply number (0-1)
+;R16=power supply number in ASCII ('0' or '1')
 ;R17=status (0=fail, 1=ok)
 send_ps_status:
     push r17              ;Push status
@@ -130,13 +127,12 @@ send_ps_status:
     ldi ZH, >(ps * 2)
     rcall uart_send_str   ;Send "PS"
 
-    pop r16               ;Pop power supply number
-    ori r16, 0x30         ;Convert to ascii
+    pop r16               ;Pop power supply number in ASCII
     rcall uart_send_byte
 
     pop r16               ;Pop status
-    cpi r16, 1
-    breq 1$               ;Branch if OK
+    sbrc r16, 0           ;Skip branch if bit 0 is clear (supply failed)
+    breq 1$               ;Branch to show OK
 
     ldi ZL, <(equals_fail * 2)
     ldi ZH, >(equals_fail * 2)
