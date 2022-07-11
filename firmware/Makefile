@@ -10,6 +10,7 @@ out.bin:
 	aslink -i out
 	srec_cat out.ihx -intel -fill 0xff 0x0000 0x0800 -o out.bin -binary
 	rm out.hlr out.ihx out.rel
+	python3 checksum.py update out.bin
 
 program: out.hex
 	avrdude -c atmelice_updi -p t212 -U flash:w:out.hex

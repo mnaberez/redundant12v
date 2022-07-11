@@ -47,6 +47,7 @@ reset:
   	sts CPU_CCP, r17					        ;Unlock Protected I/O Registers
   	sts CLKCTRL_MCLKCTRLA, r16			  ;Use EXTCLK for main clock
 
+    rcall test_rom            ;Never returns if ROM test fails
     rcall gpio_init
     rcall uart_init
 
@@ -237,6 +238,37 @@ uart_send_byte:
     sts USART0_TXDATAL, r16
     ret
 
+;Send a byte as two hexadecimal digits out the UART
+;Destroys R17
+uart_send_hex_byte:
+    push r16
+    lsr r16
+    lsr r16
+    lsr r16
+    lsr r16
+    rcall nib2asc
+    rcall uart_send_byte
+    pop r16
+    push r16
+    andi r16, 0x0f
+    rcall nib2asc
+    rcall uart_send_byte
+    pop r16
+    ret
+
+;Convert lower nibble of R16 to hexadecimal digit in ASCII
+nib2asc:
+    andi r16,0x0f
+    cpi r16,0x0a
+    brcc 1$
+    ldi r17,'0
+    add r16,r17             ;Convert to ASCII '0'-'9'
+    ret
+1$:
+    ldi r17,'7
+    add r16,r17             ;Convert to ASCII 'A'-'F'
+    ret
+
 ;Send CRLF to the UART.
 ;Destroys R16
 uart_send_crlf:
@@ -248,18 +280,53 @@ uart_send_crlf:
 ;Send a null-terminated string to the UART
 ;Destroys R16 and Z
 uart_send_str:
-1$: lpm r16, Z            ;Read byte from string
+1$: lpm r16, Z+           ;Read byte from string
     cpi r16, 0
     breq 2$               ;Branch if end of string
     rcall uart_send_byte
-
-    ldi r16, 1            ;Increment to next byte
-    add ZL, r16
-    clr r16
-    adc ZH, r16
     rjmp 1$
 2$: ret
 
+;Test the flash ROM by computing its checksum and comparing
+;it to the one in the last two bytes of the ROM.  If they
+;do not match, this routine never returns.
+test_rom:
+    ldi ZL, <(PROGMEM_START)  ;First address of ROM (low)
+    ldi ZH, >(PROGMEM_START)  ;  (high)
+
+    ldi r20, 0x55             ;Initial value of checksum (low)
+    ldi r21, 0x55             ;  (high)
+
+1$: lpm r16, Z+               ;Add byte from ROM to checksum
+    add r20, r16
+    clr r16
+    adc r21, r16
+
+    cpi ZL, <(PROGMEM_END-1)  ;Keep going until last address before the
+    brne 1$                   ;  the checksum (checksum is the last two
+    cpi ZH, >(PROGMEM_END-1)  ;  bytes of the ROM).
+    brne 1$
+
+    rcall uart_send_crlf
+    rcall uart_send_crlf
+    rcall uart_send_crlf
+    mov r16,r21               ;checksum high
+    rcall uart_send_hex_byte
+    mov r16,r20               ;checksum low
+    rcall uart_send_hex_byte
+    rcall uart_send_crlf
+
+    lpm r16, Z+               ;Read low byte of checksum in ROM
+    rcall uart_send_hex_byte
+    cp r16, r20               ;Compare with calculated low byte
+2$: brne 2$                   ;Loop forever if failed
+
+    lpm r16, Z+               ;Read high byte of checksum in ROM
+    rcall uart_send_hex_byte
+    cp r16, r21               ;Compare with calculated high byte
+3$: brne 3$                   ;Loop forever if failed
+
+    ret                       ;Checksum passed
 
 ;Wait 1ms.  Destroy R16,R17
 delay_1ms:
