@@ -22,11 +22,11 @@ jobs:
     - name: Build the firmware
       run: |
         make -C firmware/
-        cat firmware/out.lst
+        cat firmware/redundant12v.lst
 
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
         path: |
-            firmware/out.*
+            firmware/redundant12v.*

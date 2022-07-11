@@ -1,19 +1,23 @@
-all: clean out.hex
+PROJECT=redundant12v
+MMCU=t212
+ISPFLAGS=-c atmelice_updi
 
-out.hex: out.bin
-	srec_cat out.bin -binary -o out.hex -intel -address-length=2 -line-length=76 -crlf
+all: clean $(PROJECT).hex
 
-out.bin:
-	cp -f main.asm out.asm
-	asavr -l -o out.asm
-	rm -f out.asm
-	aslink -i out
-	srec_cat out.ihx -intel -fill 0xff 0x0000 0x0800 -o out.bin -binary
-	rm out.hlr out.ihx out.rel
-	python3 checksum.py update out.bin
+$(PROJECT).hex: $(PROJECT).bin
+	srec_cat $(PROJECT).bin -binary -o $(PROJECT).hex -intel -address-length=2 -line-length=76 -crlf
 
-program: out.hex
-	avrdude -c atmelice_updi -p t212 -U flash:w:out.hex
+$(PROJECT).bin: main.asm
+	cp -f main.asm $(PROJECT).asm
+	asavr -l -o $(PROJECT).asm
+	rm -f $(PROJECT).asm
+	aslink -i $(PROJECT)
+	srec_cat $(PROJECT).ihx -intel -fill 0xff 0x0000 0x0800 -o $(PROJECT).bin -binary
+	rm $(PROJECT).hlr $(PROJECT).ihx $(PROJECT).rel
+	python3 checksum.py update $(PROJECT).bin
+
+program: $(PROJECT).hex
+	avrdude $(ISPFLAGS) -p $(MMCU) -U flash:w:$(PROJECT).hex
 
 clean:
-	rm -f out.*
+	rm -f $(PROJECT).*
