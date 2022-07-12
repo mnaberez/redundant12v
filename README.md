@@ -8,13 +8,13 @@ This is a redundant, but not hot-swappable, 12VDC power supply.  It has these fe
 
  - Remote monitoring.  A serial port provides a simple "on/off" status that indicates when one of the two onboard DC supplies loses its AC power or otherwise fails.
 
-It is built on a 1U rack shelf but requires at least 2U because it is slightly taller than 1U.  The extra air space is also needed for cooling as the supply has no fans.
+It is built on a 1U rack shelf but requires at least 2U because it is slightly taller than 1U.  The extra air space is also needed for cooling because the supply has no fans.
 
 ## Background
 
-Rackmount [Automatic Transfer Switches](https://web.archive.org/web/20220408134749/https://www.youtube.com/watch?v=JSWmmY9tKrM) from companies such as [APC](https://web.archive.org/web/20220408135631/https://download.schneider-electric.com/files?p_File_Name=BSTY-AQNP38_R0_EN.pdf&p_Doc_Ref=SPD_BSTY-AQNP38_EN&p_enDocType=Catalog) and [CyberPower](https://web.archive.org/web/20220408140138/https://www.cyberpower.com/tw/en/File/GetCyberpowerFileByDocId/DS-21040002-01) can be used to provide AC power redundancy for devices with a single AC cord such as unmanaged switches and small firewall appliances.  These devices are usually powered by small power bricks.  All of the bricks are plugged into the ATS which in turn has two AC cords.
+Rackmount [Automatic Transfer Switches](https://web.archive.org/web/20220408134749/https://www.youtube.com/watch?v=JSWmmY9tKrM) from companies such as [APC](https://web.archive.org/web/20220408135631/https://download.schneider-electric.com/files?p_File_Name=BSTY-AQNP38_R0_EN.pdf&p_Doc_Ref=SPD_BSTY-AQNP38_EN&p_enDocType=Catalog) and [CyberPower](https://web.archive.org/web/20220408140138/https://www.cyberpower.com/tw/en/File/GetCyberpowerFileByDocId/DS-21040002-01) can be used to provide AC power redundancy for devices with a single AC cord.
 
-I noticed that all of the small power bricks in my rack had 12VDC output.  Instead of buying an ATS unit and plugging the bricks into it, I decided to eliminate the bricks by building this redundant 12VDC supply.  It can be built for less than the cost of most ATS units and eliminates the clutter of the bricks.
+I noticed that all of the single-corded devices in my rack ran off 12VDC power bricks.  Instead of buying an ATS unit and plugging the bricks into it, I built this redundant 12VDC supply to eliminate the bricks.  It can be built for less than the cost of most ATS units.
 
 ## Parts List
 
