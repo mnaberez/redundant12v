@@ -174,29 +174,26 @@ gpio_init:
     ret
 
 uart_init:
+    ;Set baud rate to 9600 bps for 1.8432 MHz crystal
     ;#define F_CPU 1843200
     ;#define USART0_BAUD_RATE(BAUD_RATE) ((float)(F_CPU * 64 / (16 * (float)BAUD_RATE)) + 0.5)
     ;USART0.BAUD = (uint16_t)USART0_BAUD_RATE(9600);
-    clr r16
+    ldi r16, 0x00
     sts USART0_BAUDL, r16
     ldi r16, 0x03
     sts USART0_BAUDH, r16
 
-    ;USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc /* Asynchronous Mode */
-    ;   | USART_CHSIZE_8BIT_gc /* Character size: 8 bit */
-    ;   | USART_PMODE_DISABLED_gc /* No Parity */
-    ;   | USART_SBMODE_1BIT_gc; /* 1 stop bit */
+    ;8N1
     ldi r16, USART_NORMAL_CMODE_ASYNCHRONOUS_gc | USART_NORMAL_CHSIZE_8BIT_gc | USART_NORMAL_PMODE_DISABLED_gc | USART_NORMAL_SBMODE_1BIT_gc
     sts USART0_CTRLC, r16
 
-    ;PORTA.DIR &= ~PIN7_bm;  // pa7 = rx
-    ;PORTA.DIR |= PIN6_bm;   // pa6 = tx
+    ;Set pin directions
     lds r16, PORTA_base + PORT_DIR_offset
-    andi r16, 0b01111111 ;pa7 = rx
-    ori  r16, 0b01000000 ;pa6 = tx
+    andi r16, 0b01111111 ;pa7 = rx (input)
+    ori  r16, 0b01000000 ;pa6 = tx (output)
     sts PORTA_base + PORT_DIR_offset, r16
 
-    ;USART0.CTRLB |= USART_TXEN_bm | USART_TXEN_bm;
+    ;Enable transmit and receive
     lds r16, USART0_CTRLB
     ori r16, USART_TXEN_bm | USART_RXEN_bm
     sts USART0_CTRLB, r16
@@ -240,11 +237,10 @@ uart_read_byte:
 ;Blocks until the UART accepts the byte
 ;Destroys R17
 uart_send_byte:
-    ;while (!(USART0.STATUS & USART_DREIF_bm)) {}
     lds r17, USART0_STATUS
-    sbrs r17, USART_DREIF_bp
+    sbrs r17, USART_DREIF_bp  ;Skip next if USART_DREIF=1 (tx ready)
     rjmp uart_send_byte
-    ;USART0.TXDATAL = c;
+
     sts USART0_TXDATAL, r16
     ret
 
