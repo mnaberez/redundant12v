@@ -13,7 +13,7 @@
 
     .include "tn212def.asm"
 
-ram = SRAM_START
+ram = INTERNAL_SRAM_START
 supplies = ram+0x00   ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
                       ;Bit 7..2 Unused
                       ;Bit    1 Power Supply 1
@@ -30,10 +30,20 @@ supplies = ram+0x00   ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
     .assume . - (PROGMEM_START + INT_VECTORS_SIZE)
 
 reset:
+    ;Clear RAM
+    clr r16
+    ldi ZL, <INTERNAL_SRAM_START
+    ldi ZH, >INTERNAL_SRAM_START
+1$: st Z+, r16
+    cpi ZL, <(INTERNAL_SRAM_END+1)
+    brne 1$
+    cpi ZH, >(INTERNAL_SRAM_END+1)
+    brne 1$
+
   	;Initialize stack pointer
-    ldi r16, RAMEND & 0xFF
+    ldi r16, INTERNAL_SRAM_END & 0xFF
     out CPU_SPL, r16
-    ldi r16, RAMEND >> 8
+    ldi r16, INTERNAL_SRAM_END >> 8
     out CPU_SPH, r16
 
   	;Disable clock prescaler
@@ -47,11 +57,12 @@ reset:
   	sts CPU_CCP, r17					        ;Unlock Protected I/O Registers
   	sts CLKCTRL_MCLKCTRLA, r16			  ;Use EXTCLK for main clock
 
-    rcall test_rom            ;Never returns if ROM test fails
     rcall gpio_init
     rcall uart_init
 
 main_loop:
+    rcall self_test           ;Continuously test (does not return if failed)
+
     rcall uart_has_error      ;UART error occured?
     brcs error                ;Branch if error
 
@@ -69,7 +80,6 @@ main_loop:
 error:
     rcall uart_clear_error    ;Clear the UART error
     rjmp main_loop
-
 
 ;Check power supplies 0 and 1 and update "supplies" bitfield
 ;Blocks for at least 25ms to debounce
@@ -256,9 +266,57 @@ uart_send_str:
     rjmp 1$
 2$: ret
 
+;Wait 1ms.  Destroy R16,R17
+delay_1ms:
+    ldi r16, 6
+1$:
+    ldi r17, 0xc5
+2$:
+    dec r17 ; Decrement r17
+    brne 2$ ; Branch if r17<>0
+    dec r16
+    brne 1$
+    ret
+
+;Perform self-test.  Does not return if test fails.
+self_test:
+    rcall test_ram
+    rjmp test_rom
+
+;Test the RAM non-destructively.  If test the fails, this routine
+;does not return.  Interrupts must be disabled before calling.
+;Destroys R20, R21, Z.
+test_ram:
+    ldi ZL, <INTERNAL_SRAM_START
+    ldi ZH, >INTERNAL_SRAM_START
+
+1$:
+    ld r21, Z       ;Save original value in R21
+
+    ldi r20, 0x55
+    st Z, r20
+    ld r20, Z
+    cpi r20, 0x55
+2$: brne 2$         ;Pattern 0x55 failed
+
+    ldi r20, 0xaa
+    st Z, r20
+    ld r20, Z
+    cpi r20, 0xaa
+3$: brne 3$         ;Pattern 0xAA failed
+
+    st Z+, r21      ;Restore original value, increment Z
+    cpi ZL, <(INTERNAL_SRAM_END+1)  ;Keep going until all RAM is tested
+    brne 1$
+    cpi ZH, >(INTERNAL_SRAM_END+1)
+    brne 1$
+
+    ret             ;RAM test passed
+
 ;Test the flash ROM by computing its checksum and comparing
 ;it to the one in the last two bytes of the ROM.  If they
-;do not match, this routine never returns.
+;do not match, this routine does not return.
+;Destroys R16, R20, R21, Z
 test_rom:
     ldi ZL, <(PROGMEM_START)  ;First address of ROM (low)
     ldi ZH, >(PROGMEM_START)  ;  (high)
@@ -285,15 +343,3 @@ test_rom:
 3$: brne 3$                   ;Loop forever if failed
 
     ret                       ;Checksum passed
-
-;Wait 1ms.  Destroy R16,R17
-delay_1ms:
-    ldi r16, 6
-1$:
-    ldi r17, 0xc5
-2$:
-    dec r17 ; Decrement r17
-    brne 2$ ; Branch if r17<>0
-    dec r16
-    brne 1$
-    ret
