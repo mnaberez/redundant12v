@@ -48,17 +48,7 @@ reset:
     ldi r16, >INTERNAL_SRAM_END
     out CPU_SPH, r16
 
-    ;Disable clock prescaler
-    clr r16
-    ldi r17, CPU_CCP_IOREG_gc
-    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
-    sts CLKCTRL_MCLKCTRLB, r16        ;Disable clock prescaler
-
-    ;Switch to external 1.8432 MHz oscillator
-    ldi r16, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
-    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
-    sts CLKCTRL_MCLKCTRLA, r16        ;Use EXTCLK for main clock
-
+    rcall osci_init
     rcall gpio_init
     rcall uart_init
 
@@ -66,9 +56,10 @@ main_loop:
     rcall self_test           ;Continuously test (jumps to fatal if failed)
 
     rcall uart_has_error      ;UART error occurred?
-    brcs error                ;Branch if error
+    brcc 1$                   ;No: keep going
+    rjmp fatal                ;Yes: reset to ensure UART fully recovers
 
-    rcall uart_has_byte       ;Byte received?
+1$: rcall uart_has_byte       ;Byte received?
     brcc main_loop            ;No: keep waiting
 
     rcall uart_read_byte
@@ -79,18 +70,13 @@ main_loop:
     rcall send_status_line
     rjmp main_loop
 
-error:
-    rcall uart_clear_error    ;Clear the UART error
-    rjmp main_loop
-
 ;Check power supplies 0 and 1 and update "supplies" bitfield
 ;Blocks for at least 25ms to debounce
 ;Destroys R16,R17,R18
 update_supplies:
     ldi r18, 25             ;Debounce: PORTA must be the same for N readings
 
-1$:
-    lds r16, PORTA_IN       ;Read once
+1$: lds r16, PORTA_IN       ;Read once
     andi r16, 0b00000110    ;PA2=Power Supply 1, PA1=Power Supply 0
 
     push r16
@@ -151,9 +137,7 @@ send_ps_status:
     ldi ZH, >(equals_fail * 2)
     rjmp uart_send_str    ;Send "=FAIL"
 
-1$:
-    ;Send "=OK"
-    ldi ZL, <(equals_ok * 2)
+1$: ldi ZL, <(equals_ok * 2)
     ldi ZH, >(equals_ok * 2)
     rjmp uart_send_str    ;Send "=OK"
 
@@ -169,12 +153,28 @@ send_ps_status:
     .ascii "=OK"
     .byte 0
 
+;Switch to the external oscillator
+osci_init:
+    ;Disable clock prescaler
+    clr r16
+    ldi r17, CPU_CCP_IOREG_gc
+    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLB, r16        ;Disable clock prescaler
+
+    ;Switch to external 1.8432 MHz oscillator
+    ldi r16, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
+    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLA, r16        ;Use EXTCLK for main clock
+    ret
+
+;Set up GPIO directions (UART pin directions are set in uart_init)
 gpio_init:
     lds r16, PORTA_base + PORT_DIR_offset
     andi r16, 0b11111001 ;pa2, pa1 = input
     sts PORTA_base + PORT_DIR_offset, r16
     ret
 
+;Initialize the UART
 uart_init:
     ;Set baud rate to 9600 bps for 1.8432 MHz crystal
     ;#define F_CPU 1843200
@@ -209,14 +209,7 @@ uart_has_error:
     andi r16, USART_BUFOVF_bm | USART_FERR_bm | USART_PERR_bm
     breq 1$
     sec
-1$:
-    ret
-
-;Clear the UART error status bits
-uart_clear_error:
-    lds r16, USART0_RXDATAH
-    lds r16, USART0_RXDATAL
-    ret
+1$: ret
 
 ;Check if a byte has been received from the UART
 ;Sets carry if one is available
@@ -257,21 +250,19 @@ uart_send_crlf:
 ;Send a null-terminated string to the UART
 ;Destroys R16 and Z
 uart_send_str:
-1$: lpm r16, Z+           ;Read byte from string
+    lpm r16, Z+           ;Read byte from string
     cpi r16, 0
     breq 2$               ;Branch if end of string
     rcall uart_send_byte
-    rjmp 1$
+    rjmp uart_send_str
 2$: ret
 
 ;Wait 1ms.  Destroy R16,R17
 delay_1ms:
     ldi r16, 6
-1$:
-    ldi r17, 0xc5
-2$:
-    dec r17 ; Decrement r17
-    brne 2$ ; Branch if r17<>0
+1$: ldi r17, 0xc5
+2$: dec r17
+    brne 2$
     dec r16
     brne 1$
     ret
