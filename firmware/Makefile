@@ -12,7 +12,7 @@ $(PROJECT).bin: main.asm
 	asavr -l -o $(PROJECT).asm
 	rm -f $(PROJECT).asm
 	aslink -i $(PROJECT)
-	srec_cat $(PROJECT).ihx -intel -fill 0xff 0x0000 0x0800 -o $(PROJECT).bin -binary
+	srec_cat $(PROJECT).ihx -intel -o $(PROJECT).bin -binary
 	rm $(PROJECT).hlr $(PROJECT).ihx $(PROJECT).rel
 	python3 checksum.py update $(PROJECT).bin
 

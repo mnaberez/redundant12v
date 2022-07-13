@@ -14,12 +14,13 @@
     .include "tn212def.asm"
 
 ram = INTERNAL_SRAM_START
-supplies = ram+0x00   ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
-                      ;Bit 7..2 Unused
-                      ;Bit    1 Power Supply 1
-                      ;Bit    0 Power Supply 0
+supplies = ram+0x00       ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
+                          ;Bit 7..2 Unused
+                          ;Bit    1 Power Supply 1
+                          ;Bit    0 Power Supply 0
 
-    .org PROGMEM_START
+    .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
+                          ;but ASAVR treats program space as word-addressed.
 
     ;All vectors jump to reset (this program does not use interrupts)
     .rept INT_VECTORS_SIZE
@@ -27,7 +28,7 @@ supplies = ram+0x00   ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
     .endm
 
     ;Code starts at first location after vectors
-    .assume . - (PROGMEM_START + INT_VECTORS_SIZE)
+    .assume . - ((PROGMEM_START/2) + INT_VECTORS_SIZE)
 
 reset:
     ;Clear RAM
@@ -339,3 +340,17 @@ test_rom:
 3$: brne 3$                   ;Loop forever if failed
 
     ret                       ;Checksum passed
+
+;End of code
+
+    ;Fill all unused program words with a nop sled that ends with
+    ;a jump to reset in case the program counter somehow gets here.
+    .nval filler_start,.
+    .rept ((PROGMEM_END/2) - filler_start - 1)
+    nop
+    .endm
+    rjmp reset
+
+    ;Last program word (last 2 bytes) is the checksum
+    .assume . - (PROGMEM_END/2)
+    .word 0
