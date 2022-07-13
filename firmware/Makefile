@@ -9,7 +9,7 @@ $(PROJECT).hex: $(PROJECT).bin
 
 $(PROJECT).bin: main.asm
 	cp -f main.asm $(PROJECT).asm
-	asavr -l -o $(PROJECT).asm
+	asavr -l -p -w -o $(PROJECT).asm
 	rm -f $(PROJECT).asm
 	aslink -i $(PROJECT)
 	srec_cat $(PROJECT).ihx -intel -o $(PROJECT).bin -binary
