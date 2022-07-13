@@ -21,10 +21,11 @@ supplies = ram+0x00       ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
 
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.
-
-    ;All vectors jump to reset (this program does not use interrupts)
-    .rept INT_VECTORS_SIZE
     rjmp reset
+
+    ;All interrupt vectors jump to fatal error (interrupts are not used)
+    .rept INT_VECTORS_SIZE - 1
+    rjmp fatal
     .endm
 
     ;Code starts at first location after vectors
@@ -54,7 +55,7 @@ reset:
     sts CLKCTRL_MCLKCTRLB, r16        ;Disable clock prescaler
 
     ;Switch to external 1.8432 MHz oscillator
-    ldi r16, CLKCTRL_CLKSEL_EXTCLK_gc  ;EXTCLK 1.8432 MHz external clock
+    ldi r16, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
     sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
     sts CLKCTRL_MCLKCTRLA, r16        ;Use EXTCLK for main clock
 
@@ -62,9 +63,9 @@ reset:
     rcall uart_init
 
 main_loop:
-    rcall self_test           ;Continuously test (does not return if failed)
+    rcall self_test           ;Continuously test (jumps to fatal if failed)
 
-    rcall uart_has_error      ;UART error occured?
+    rcall uart_has_error      ;UART error occurred?
     brcs error                ;Branch if error
 
     rcall uart_has_byte       ;Byte received?
@@ -280,29 +281,30 @@ self_test:
     rcall test_ram
     rjmp test_rom
 
-;Test the RAM non-destructively.  If test the fails, this routine
-;does not return.  Interrupts must be disabled before calling.
+;Test the RAM non-destructively.  Jumps to fatal if test the fails.
+;Interrupts must be disabled before calling.
 ;Destroys R20, R21, Z.
 test_ram:
     ldi ZL, <INTERNAL_SRAM_START
     ldi ZH, >INTERNAL_SRAM_START
 
-1$:
-    ld r21, Z       ;Save original value in R21
+1$: ld r21, Z       ;Save original value in R21
 
     ldi r20, 0x55
     st Z, r20
     ld r20, Z
     cpi r20, 0x55
-2$: brne 2$         ;Pattern 0x55 failed
+    breq 2$
+    rjmp fatal      ;Pattern 0x55 failed
 
-    ldi r20, 0xaa
+2$: ldi r20, 0xaa
     st Z, r20
     ld r20, Z
     cpi r20, 0xaa
-3$: brne 3$         ;Pattern 0xAA failed
+    breq 3$
+    rjmp fatal      ;Pattern 0xAA failed
 
-    st Z+, r21      ;Restore original value, increment Z
+3$: st Z+, r21      ;Restore original value, increment Z
     cpi ZL, <(INTERNAL_SRAM_END+1)  ;Keep going until all RAM is tested
     brne 1$
     cpi ZH, >(INTERNAL_SRAM_END+1)
@@ -311,8 +313,8 @@ test_ram:
     ret             ;RAM test passed
 
 ;Test the flash ROM by computing its checksum and comparing
-;it to the one in the last two bytes of the ROM.  If they
-;do not match, this routine does not return.
+;it to the one in the last two bytes of the ROM.  Jumps to
+;fatal if they do not match.
 ;Destroys R16, R20, R21, Z
 test_rom:
     ldi ZL, <(PROGMEM_START)  ;First address of ROM (low)
@@ -332,25 +334,37 @@ test_rom:
     brne 1$
 
     lpm r16, Z+               ;Read low byte of checksum in ROM
-    cp r16, r20               ;Compare with calculated low byte
-2$: brne 2$                   ;Loop forever if failed
+    cp r16, r20               ;Compare with calculated
+    breq 2$
+    rjmp fatal
 
-    lpm r16, Z+               ;Read high byte of checksum in ROM
-    cp r16, r21               ;Compare with calculated high byte
-3$: brne 3$                   ;Loop forever if failed
+2$: lpm r16, Z+               ;Read high byte of checksum in ROM
+    cp r16, r21               ;Compare with calculated
+    breq 3$
+    rjmp fatal
 
-    ret                       ;Checksum passed
+3$: ret                       ;Checksum passed
 
 ;End of code
 
     ;Fill all unused program words with a nop sled that ends with
-    ;a jump to reset in case the program counter somehow gets here.
+    ;a software reset in case the program counter somehow gets here.
     .nval filler_start,.
-    .rept ((PROGMEM_END/2) - filler_start - 1)
+    .rept ((PROGMEM_END/2) - filler_start - fatal_size)
     nop
     .endm
-    rjmp reset
 
-    ;Last program word (last 2 bytes) is the checksum
+;Fatal error causes software reset
+fatal:
+    cli                       ;Disable interrupts
+    ldi r16, CPU_CCP_IOREG_gc
+    ldi r17, RSTCTRL_SWRE_bm
+    sts CPU_CCP, r16          ;Unlock Protected I/O Registers
+    sts RSTCTRL_SWRR, r17     ;Software Reset
+
+fatal_size = . - fatal
+
+;Last program word (last 2 bytes) is the checksum
+checksum:
     .assume . - (PROGMEM_END/2)
     .word 0
