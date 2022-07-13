@@ -267,7 +267,7 @@ delay_1ms:
     brne 1$
     ret
 
-;Perform self-test.  Does not return if test fails.
+;Perform self-test.  Jumps to fatal if the test fails.
 self_test:
     rcall test_ram
     rjmp test_rom
@@ -303,38 +303,22 @@ test_ram:
 
     ret             ;RAM test passed
 
-;Test the flash ROM by computing its checksum and comparing
-;it to the one in the last two bytes of the ROM.  Jumps to
-;fatal if they do not match.
-;Destroys R16, R20, R21, Z
+;Test the flash ROM by using the CRCSCAN peripheral to compute the
+;CRC16 of the flash and compare it to the CRC16 stored in the last
+;two bytes of the flash.  Jumps to fatal if they do not match.
+;Destroys R16.
 test_rom:
-    ldi ZL, <(PROGMEM_START)  ;First address of ROM (low)
-    ldi ZH, >(PROGMEM_START)  ;  (high)
+    ldi r16, CRCSCAN_ENABLE_bm
+    sts CRCSCAN_CTRLA, r16    ;Start CRC scan
 
-    ldi r20, 0x55             ;Initial value of checksum (low)
-    ldi r21, 0x55             ;  (high)
+1$: lds r16, CRCSCAN_STATUS
+    sbrc r16, CRCSCAN_BUSY_bp ;Skip next if busy=0 (scan finished)
+    rjmp 1$
 
-1$: lpm r16, Z+               ;Add byte from ROM to checksum
-    add r20, r16
-    clr r16
-    adc r21, r16
-
-    cpi ZL, <(PROGMEM_END-1)  ;Keep going until last address before the
-    brne 1$                   ;  the checksum (checksum is the last two
-    cpi ZH, >(PROGMEM_END-1)  ;  bytes of the ROM).
-    brne 1$
-
-    lpm r16, Z+               ;Read low byte of checksum in ROM
-    cp r16, r20               ;Compare with calculated
-    breq 2$
+    sbrs r16, CRCSCAN_OK_bp   ;Skip next if ok=1 (scan passed)
     rjmp fatal
 
-2$: lpm r16, Z+               ;Read high byte of checksum in ROM
-    cp r16, r21               ;Compare with calculated
-    breq 3$
-    rjmp fatal
-
-3$: ret                       ;Checksum passed
+    ret
 
 ;End of code
 
@@ -355,7 +339,6 @@ fatal:
 
 fatal_size = . - fatal
 
-;Last program word (last 2 bytes) is the checksum
-checksum:
+;Last program word (last 2 bytes) will be the CRC16 added by the Makefile
+crc16:
     .assume . - (PROGMEM_END/2)
-    .word 0

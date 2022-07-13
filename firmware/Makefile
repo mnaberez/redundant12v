@@ -1,5 +1,6 @@
 PROJECT=redundant12v
 MMCU=t212
+CRC16ADDR=0x07fe
 ISPFLAGS=-c atmelice_updi
 
 all: clean $(PROJECT).hex
@@ -12,9 +13,9 @@ $(PROJECT).bin: main.asm
 	asavr -l -p -w -o $(PROJECT).asm
 	rm -f $(PROJECT).asm
 	aslink -i $(PROJECT)
-	srec_cat $(PROJECT).ihx -intel -o $(PROJECT).bin -binary
+	# requires srecord 1.64 or later
+	srec_cat $(PROJECT).ihx -intel -CRC16_Big_Endian $(CRC16ADDR) -broken -o $(PROJECT).bin -binary
 	rm $(PROJECT).hlr $(PROJECT).ihx $(PROJECT).rel
-	python3 checksum.py update $(PROJECT).bin
 
 program: $(PROJECT).hex
 	avrdude $(ISPFLAGS) -p $(MMCU) -U flash:w:$(PROJECT).hex
