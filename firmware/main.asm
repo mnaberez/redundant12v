@@ -51,9 +51,12 @@ reset:
     rcall osci_init
     rcall gpio_init
     rcall uart_init
+    rcall wdog_init
 
 main_loop:
-    rcall self_test           ;Continuously test (jumps to fatal if failed)
+    wdr                       ;Keep watchdog happy
+
+    rcall self_test           ;Self-test each iteration (jumps to fatal if failed)
 
     rcall uart_has_error      ;UART error occurred?
     brcc 1$                   ;No: keep going
@@ -154,17 +157,38 @@ send_ps_status:
     .byte 0
 
 ;Switch to the external oscillator
+;Interrupts must be disabled before calling
 osci_init:
+    ldi r16, CPU_CCP_IOREG_gc
+
     ;Disable clock prescaler
-    clr r16
-    ldi r17, CPU_CCP_IOREG_gc
-    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
-    sts CLKCTRL_MCLKCTRLB, r16        ;Disable clock prescaler
+    clr r17                           ;No prescaler
+    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLB, r17        ;Disable clock prescaler
 
     ;Switch to external 1.8432 MHz oscillator
-    ldi r16, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
-    sts CPU_CCP, r17                  ;Unlock Protected I/O Registers
-    sts CLKCTRL_MCLKCTRLA, r16        ;Use EXTCLK for main clock
+    ldi r17, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
+    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    sts CLKCTRL_MCLKCTRLA, r17        ;Use EXTCLK for main clock
+    ret
+
+;Start the watchdog.  The WDR instruction must be executed at least
+;once every 4 seconds or the watchdog will reset the system.
+;Interrupts must be disabled before calling
+wdog_init:
+    ldi r16, CPU_CCP_IOREG_gc
+
+    ;Configure watchdog mode and start it
+    ldi r17, WDT_PERIOD_4KCLK_gc
+    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    sts WDT_CTRLA, r17                ;Start 4 sec "normal" watchdog mode
+
+    ;Write protect watchdog so it can't be stopped
+    ldi r17, WDT_LOCK_bm
+    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    sts WDT_STATUS, r17               ;Write protect WDT_CTRLA
+
+    wdr                               ;Reset watchdog timer
     ret
 
 ;Set up GPIO directions (UART pin directions are set in uart_init)
