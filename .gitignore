@@ -1,4 +1,4 @@
-firmware/redundant12v.*
+firmware/redundant12v_flash.*
+firmware/redundant12v_fuses.*
 *-backups/
 fp-info-cache
-
