@@ -167,12 +167,12 @@ osci_init:
 
     ;Disable clock prescaler
     clr r17                           ;No prescaler
-    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
     sts CLKCTRL_MCLKCTRLB, r17        ;Disable clock prescaler
 
     ;Switch to external 1.8432 MHz oscillator
     ldi r17, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
-    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
     sts CLKCTRL_MCLKCTRLA, r17        ;Use EXTCLK for main clock
     ret
 
@@ -184,12 +184,12 @@ wdog_init:
 
     ;Configure watchdog mode and start it
     ldi r17, WDT_PERIOD_4KCLK_gc
-    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
     sts WDT_CTRLA, r17                ;Start 4 sec "normal" watchdog mode
 
     ;Write protect watchdog so it can't be stopped
     ldi r17, WDT_LOCK_bm
-    sts CPU_CCP, r16                  ;Unlock Protected I/O Registers
+    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
     sts WDT_STATUS, r17               ;Write protect WDT_CTRLA
 
     wdr                               ;Reset watchdog timer
@@ -362,7 +362,7 @@ fatal:
     cli                       ;Disable interrupts
     ldi r16, CPU_CCP_IOREG_gc
     ldi r17, RSTCTRL_SWRE_bm
-    sts CPU_CCP, r16          ;Unlock Protected I/O Registers
+    out CPU_CCP, r16          ;Unlock Protected I/O Registers
     sts RSTCTRL_SWRR, r17     ;Software Reset
 
 fatal_size = . - fatal
