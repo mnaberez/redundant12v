@@ -36,8 +36,12 @@ reset:
     clr r16
     ldi ZL, <INTERNAL_SRAM_START
     ldi ZH, >INTERNAL_SRAM_START
-1$: st Z+, r16
-    cpi ZL, <(INTERNAL_SRAM_END+1)
+1$: st Z, r16                 ;Store 0 at Z
+    ld r16, Z+                ;Read it back, increment Z
+    cpi r16, 0                ;Did it read back as 0?
+    breq 2$                   ;Yes: continue clearing
+    rjmp fatal                ;No: hardware failure, jump to fatal
+2$: cpi ZL, <(INTERNAL_SRAM_END+1)
     brne 1$
     cpi ZH, >(INTERNAL_SRAM_END+1)
     brne 1$
