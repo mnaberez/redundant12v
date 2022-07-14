@@ -12,7 +12,7 @@ clean:
 	rm -f $(PROJECT_FLASH).* $(PROJECT_FUSES).*
 
 program: $(PROJECT_FLASH).hex $(PROJECT_FUSES).hex
-	avrdude $(ISPFLAGS) -p $(MMCU) -U flash:w:$(PROJECT_FLASH).hex -U fuses:w:$(PROJECT_FUSES).hex
+	avrdude $(ISPFLAGS) -p $(MMCU) -U flash:w:$(PROJECT_FLASH).hex:i -U fuses:w:$(PROJECT_FUSES).hex:i
 
 $(PROJECT_FLASH).hex: main.asm
 	cp -f main.asm $(PROJECT_FLASH).asm
