@@ -33,9 +33,9 @@ supplies = ram+0x00       ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
 
 reset:
     ;Clear RAM
-    clr r16
     ldi ZL, <INTERNAL_SRAM_START
     ldi ZH, >INTERNAL_SRAM_START
+    clr r16
 1$: st Z, r16                 ;Store 0 at Z
     ld r16, Z+                ;Read it back, increment Z
     tst r16                   ;Did it read back as 0?
@@ -52,10 +52,10 @@ reset:
     ldi r16, >INTERNAL_SRAM_END
     out CPU_SPH, r16
 
+    rcall wdog_init
     rcall osci_init
     rcall gpio_init
     rcall uart_init
-    rcall wdog_init
 
 main_loop:
     wdr                       ;Keep watchdog happy
@@ -160,8 +160,27 @@ send_ps_status:
     .ascii "=OK"
     .byte 0
 
-;Switch to the external oscillator
-;Interrupts must be disabled before calling
+;Ensure the watchdog was started by the fuses and reset the timer.
+;The WDR instruction must be executed at least once every 4 seconds
+;or the watchdog will reset the system.
+wdog_init:
+    ;Ensure watchdog period has been configured
+    lds r16, WDT_CTRLA
+    andi r16, WDT_PERIOD_gm
+    cpi r16, WDT_PERIOD_4KCLK_gc      ;Watchdog period set by the fuses?
+    breq 1$                           ;Yes: continue
+    rjmp fatal                        ;No: bad fuses, jump to fatal
+
+    ;Ensure watchdog is locked so it can't be stopped
+1$: lds r16, WDT_STATUS
+    sbrs r16, WDT_LOCK_bp             ;Skip fatal if locked
+    rjmp fatal
+
+    wdr                               ;Reset watchdog timer
+    ret
+
+;Switch to the external oscillator.
+;Interrupts must be disabled before calling.
 osci_init:
     ldi r16, CPU_CCP_IOREG_gc
 
@@ -174,25 +193,6 @@ osci_init:
     ldi r17, CLKCTRL_CLKSEL_EXTCLK_gc ;EXTCLK 1.8432 MHz external clock
     out CPU_CCP, r16                  ;Unlock Protected I/O Registers
     sts CLKCTRL_MCLKCTRLA, r17        ;Use EXTCLK for main clock
-    ret
-
-;Start the watchdog.  The WDR instruction must be executed at least
-;once every 4 seconds or the watchdog will reset the system.
-;Interrupts must be disabled before calling
-wdog_init:
-    ldi r16, CPU_CCP_IOREG_gc
-
-    ;Configure watchdog mode and start it
-    ldi r17, WDT_PERIOD_4KCLK_gc
-    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
-    sts WDT_CTRLA, r17                ;Start 4 sec "normal" watchdog mode
-
-    ;Write protect watchdog so it can't be stopped
-    ldi r17, WDT_LOCK_bm
-    out CPU_CCP, r16                  ;Unlock Protected I/O Registers
-    sts WDT_STATUS, r17               ;Write protect WDT_CTRLA
-
-    wdr                               ;Reset watchdog timer
     ret
 
 ;Set up GPIO directions (UART pin directions are set in uart_init)

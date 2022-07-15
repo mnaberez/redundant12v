@@ -4,7 +4,7 @@
 
 ;Watchdog Configuration
 .org 0+FUSE_WDTCFG_offset
-.byte (0<<FUSE_PERIOD0_bp) | (0<<FUSE_PERIOD1_bp) | (0<<FUSE_PERIOD2_bp) | (0<<FUSE_PERIOD3_bp) | (0<<FUSE_WINDOW3_bp) | (0<<FUSE_WINDOW2_bp) | (0<<FUSE_WINDOW1_bp) | (0<<FUSE_WINDOW0_bp)
+.byte FUSE_WINDOW_OFF_gc | FUSE_PERIOD_4KCLK_gc
 
 ;BOD Configuration
 .org 0+FUSE_BODCFG_offset
