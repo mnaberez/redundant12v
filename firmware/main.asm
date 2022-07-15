@@ -242,10 +242,9 @@ uart_has_error:
 ;Check if a byte has been received from the UART
 ;Sets carry if one is available
 uart_has_byte:
-    clc
     lds r16, USART0_STATUS
-    sbrc r16, USART_RXCIF_bp    ;Skip setting carry if no char received
-    sec
+    .assume 7 - USART_RXCIF_bp  ;RXCIF must be bit 7 for ROL to work
+    rol r16                     ;Rotate RXCIF into carry (0=no char, 1=char avail)
     ret
 
 ;Read a byte from the UART
