@@ -197,9 +197,8 @@ osci_init:
 
 ;Set up GPIO directions (UART pin directions are set in uart_init)
 gpio_init:
-    lds r16, PORTA_base + PORT_DIR_offset
-    andi r16, 0b11111001 ;pa2, pa1 = input
-    sts PORTA_base + PORT_DIR_offset, r16
+    ldi r16, 1<<2 | 1<<1    ;PA2, PA1 = input
+    sts PORTA_DIRCLR, r16
     ret
 
 ;Initialize the UART
@@ -218,10 +217,10 @@ uart_init:
     sts USART0_CTRLC, r16
 
     ;Set pin directions
-    lds r16, PORTA_base + PORT_DIR_offset
-    andi r16, 0b01111111 ;pa7 = rx (input)
-    ori  r16, 0b01000000 ;pa6 = tx (output)
-    sts PORTA_base + PORT_DIR_offset, r16
+    ldi r16, 1<<7           ;pa7 = rx (input)
+    sts PORTA_DIRCLR, r16
+    ldi r16, 1<<6           ;pa6 = tx (output)
+    sts PORTA_DIRSET, r16
 
     ;Enable transmit and receive
     lds r16, USART0_CTRLB
