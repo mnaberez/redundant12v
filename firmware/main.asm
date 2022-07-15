@@ -13,12 +13,6 @@
 
     .include "tn212def.asm"
 
-ram = INTERNAL_SRAM_START
-supplies = ram+0x00       ;Bitfield of power supply "ok" statuses (0=fail, 1=ok)
-                          ;Bit 7..2 Unused
-                          ;Bit    1 Power Supply 1
-                          ;Bit    0 Power Supply 0
-
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.
     rjmp reset
@@ -73,14 +67,18 @@ main_loop:
     cpi r16, '\r              ;Byte received = '\r'?
     brne main_loop            ;No: keep waiting
 
-    rcall update_supplies
+    rcall check_supplies
     rcall send_status_line
     rjmp main_loop
 
-;Check power supplies 0 and 1 and update "supplies" bitfield
+;Check power supplies 0 and 1
 ;Blocks for at least 25ms to debounce
+;Returns R16 = Bitfield of power supply "ok" statuses
+;              Bit 7..2 Unused
+;              Bit    1 Power Supply 1
+;              Bit    0 Power Supply 0
 ;Destroys R16,R17,R18
-update_supplies:
+check_supplies:
     ldi r18, 25             ;Debounce: PORTA must be the same for N readings
 
 1$: lds r16, PORTA_IN       ;Read once
@@ -94,40 +92,39 @@ update_supplies:
     andi r17, 0b00000110
 
     cp r16, r17
-    brne update_supplies    ;Start over if readings are different
+    brne check_supplies     ;Start over if readings are different
 
     dec r18
     brne 1$                 ;Loop until all required readings are the same
 
     ;R16 and R17 both contain the debounced and masked PORTA
-
     lsr r16                 ;Rotate right once so bit 1 = Supply 1, bit 0 = Supply 0
-    sts supplies,r16        ;Store as new supplies status
     ret
 
-;Send status like like "PS0=OK,PS1=OK\r\n"
+;Send status line like "PS0=OK,PS1=OK\r\n"
+;Call with R16=statuses bitfield from check_supplies
 send_status_line:
-    ldi r16, '0             ;Supply number to display in ASCII = '0'
-    lds r17, supplies       ;Get supplies bitfield
-    andi r17, 1             ;Mask off to leave only bit 0 (supply 0 status)
+    push r16                ;Push supply statuses bitfield
+    andi r16, 1             ;Mask off to leave only bit 0 (supply 0 status)
+    ldi r17, '0             ;Supply number to display in ASCII = '0'
     rcall send_ps_status
 
     ldi r16, ',
     rcall uart_send_byte
 
-    ldi r16, '1             ;Supply number to display in ASCII = '1'
-    lds r17, supplies       ;Get supplies bitfield
-    lsr r17                 ;Rotate bit 0 (supply 1 status) into bit 0
+    pop r16                 ;Pop supplies bitfield
+    lsr r16                 ;Rotate bit 0 (supply 1 status) into bit 0
+    ldi r17, '1             ;Supply number to display in ASCII = '1'
     rcall send_ps_status
 
     rjmp uart_send_crlf
 
 ;Send "PSn=OK" or "PSn=FAIL"
-;R16=power supply number in ASCII ('0' or '1')
-;R17=status (0=fail, 1=ok)
+;Call with R16=status in bit 0 (0=fail, 1=ok)
+;          R17=power supply number in ASCII ('0' or '1')
 send_ps_status:
-    push r17              ;Push status
-    push r16              ;Push power supply number
+    push r16              ;Push status in bit 0
+    push r17              ;Push power supply number
 
     ldi ZL, <(ps * 2)
     ldi ZH, >(ps * 2)
@@ -136,7 +133,7 @@ send_ps_status:
     pop r16               ;Pop power supply number in ASCII
     rcall uart_send_byte
 
-    pop r16               ;Pop status
+    pop r16               ;Pop status in bit 0
     sbrc r16, 0           ;Skip branch if bit 0 is clear (supply failed)
     breq 1$               ;Branch to show OK
 
@@ -277,8 +274,8 @@ uart_send_crlf:
 ;Destroys R16 and Z
 uart_send_str:
     lpm r16, Z+           ;Read byte from string
-    cpi r16, 0
-    breq 2$               ;Branch if end of string
+    tst r16               ;End of string?
+    breq 2$               ;Yes: Branch to return
     rcall uart_send_byte
     rjmp uart_send_str
 2$: ret
