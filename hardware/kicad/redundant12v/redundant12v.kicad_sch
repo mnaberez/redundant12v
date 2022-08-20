@@ -1939,7 +1939,7 @@
     (in_bom yes) (on_board yes)
     (uuid 536d55a4-3759-4f62-a47d-eabc58b4f4c3)
     (property "Reference" "R4" (id 0) (at 60.96 128.27 90))
-    (property "Value" "100" (id 1) (at 60.96 130.81 90))
+    (property "Value" "150" (id 1) (at 60.96 130.81 90))
     (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (id 2) (at 61.214 124.714 90)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2313,7 +2313,7 @@
     (in_bom yes) (on_board yes)
     (uuid de0a58e5-7f3d-4ccf-ac8a-4cd50321ae36)
     (property "Reference" "R3" (id 0) (at 63.5 95.25 90))
-    (property "Value" "100" (id 1) (at 63.5 97.79 90))
+    (property "Value" "150" (id 1) (at 63.5 97.79 90))
     (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (id 2) (at 63.754 91.694 90)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2504,10 +2504,10 @@
       (reference "R2") (unit 1) (value "10K") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
     )
     (path "/de0a58e5-7f3d-4ccf-ac8a-4cd50321ae36"
-      (reference "R3") (unit 1) (value "100") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+      (reference "R3") (unit 1) (value "150") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
     )
     (path "/536d55a4-3759-4f62-a47d-eabc58b4f4c3"
-      (reference "R4") (unit 1) (value "100") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+      (reference "R4") (unit 1) (value "150") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
     )
     (path "/18e8ff8f-d1a5-4881-b417-bc839120dcd6"
       (reference "U1") (unit 1) (value "ATtiny212-SS") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
