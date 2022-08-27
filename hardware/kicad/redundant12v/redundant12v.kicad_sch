@@ -1795,7 +1795,7 @@
     (property "Reference" "U2" (id 0) (at 186.69 68.58 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "MAX232CPE" (id 1) (at 186.1694 71.12 0)
+    (property "Value" "TI MAX232EID" (id 1) (at 186.1694 71.12 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" (id 2) (at 185.42 125.73 0)
@@ -2676,7 +2676,7 @@
       (reference "U1") (unit 1) (value "ATTINY212-SSF") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
     (path "/07decc8d-143b-433a-959b-b8fccf779f4d"
-      (reference "U2") (unit 1) (value "MAX232CPE") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
+      (reference "U2") (unit 1) (value "TI MAX232EID") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/7835d074-be50-46e8-aa67-f1fb94cafd58"
       (reference "U3") (unit 1) (value "LD1117S50CTR") (footprint "Package_TO_SOT_SMD:SOT-223-3_TabPin2")

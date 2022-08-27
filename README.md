@@ -47,7 +47,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 | Part | Qty | Reference Designators |
 |------|-----|-----------------------|
 |[ATTINY212-SSF](https://www.mouser.com/ProductDetail/Microchip-Technology-Atmel/ATTINY212-SSF?qs=3HJ2avRr9PIUVUh7FL50hQ%3D%3D) Microcontroller SOIC-8 | 1 | U1 |
-|[MAX232ECWE+T](https://www.mouser.com/ProductDetail/700-MAX232ECWET) RS232 Transceiver SOIC-8 | 1 | U2 |
+|[MAX232EID](https://www.mouser.com/ProductDetail/595-MAX232EID) TI RS232 Transceiver SOIC-8 | 1 | U2 |
 |[ECS-3951M-018-AU-TR](https://www.mouser.com/ProductDetail/ECS/ECS-3951M-018-AU-TR) 1.8432 MHz Oscillator | 1 | X1 |
 |[SMMBT3904LT1G](https://www.mouser.com/ProductDetail/onsemi/SMMBT3904LT1G) NPN Transistor | 2 | Q1, Q2 |
 |[BZX84-A15,215](https://www.mouser.com/ProductDetail/Nexperia/BZX84-A15215) 15V Zener Diode | 1 | D1 |
