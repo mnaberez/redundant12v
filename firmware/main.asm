@@ -1,17 +1,18 @@
-;ATtiny212
+;ATtiny212 or ATtiny412
 ;1 VCC
-;2 PA6 TX -> MAX232CPE  T1IN 11 -> T1OUT 14 -> DB9 TX 2
-;3 PA7 RX <- MAX232CPE R1OUT 12 <-  R1IN 13 <- DB9 RX 3
-;4 PA1 <- Power Supply 0 status (0=fail, 1=ok)
-;5 PA2 <- Power Supply 1 status (0=fail, 1=ok)
+;2 PA6 TX to MAX232
+;3 PA7 RX from MAX232
+;4 PA1 Digital Input: Power Supply 0 status (0=fail, 1=ok)
+;5 PA2 Digital Input: Power Supply 1 status (0=fail, 1=ok)
 ;6 UPDI
-;7 EXTCLK
-;8 GND    -> DB9 GND 5
+;7 EXTCLK (from 1.8432 MHz oscillator)
+;8 GND
+
+    ;Definitions file "tn212.def.asm" or "tn412.def.asm"
+    ;will be included first by the Makefile.
 
     .area code (abs)
     .list (me)
-
-    .include "tn212def.asm"
 
     .org PROGMEM_START/2  ;/2 because PROGMEM_START constant is byte-addressed
                           ;but ASAVR treats program space as word-addressed.

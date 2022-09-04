@@ -19,16 +19,22 @@ jobs:
     - name: Install srecord
       run: sudo apt-get install srecord
 
-    - name: Build the firmware
+    - name: Build the firmware (Attiny212 version)
       run: |
-        make -C firmware/
-        cat firmware/redundant12v_flash.lst
-        cat firmware/redundant12v_fuses.lst
+        make -C firmware/ MCU=t212
+        cat firmware/redundant12v_t212_flash.lst
+        cat firmware/redundant12v_t212_fuses.lst
+
+    - name: Build the firmware (Attiny412 version)
+      run: |
+        make -C firmware/ MCU=t412
+        cat firmware/redundant12v_t412_flash.lst
+        cat firmware/redundant12v_t412_fuses.lst
 
     - name: 'Upload build artifacts'
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
         path: |
-            firmware/redundant12v_flash.*
-            firmware/redundant12v_fuses.*
+            firmware/redundant12v_*_flash.*
+            firmware/redundant12v_*_fuses.*

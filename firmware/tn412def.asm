@@ -8,12 +8,12 @@
 ;* A P P L I C A T I O N   N O T E   F O R   T H E   A V R   F A M I L Y
 ;*
 ;* Number            : AVR000
-;* File Name         : tn212def.inc
-;* Title             : Register/Bit Definitions for the ATtiny212
-;* Created           : 2020-10-30 11:23
+;* File Name         : tn412def.inc
+;* Title             : Register/Bit Definitions for the ATtiny412
+;* Created           : 2021-03-01 11:32
 ;* Version           : 1.00
 ;* Support e-mail    : avr@atmel.com
-;* Target MCU        : ATtiny212
+;* Target MCU        : ATtiny412
 ;*
 ;* DESCRIPTION
 ;* When including this file in the assembly program file, all I/O register
@@ -26,14 +26,11 @@
 
 
 
-
 ; ***** SPECIFY DEVICE ***************************************************
 
-
-SIGNATURE_000	= 0x1E
-SIGNATURE_001	= 0x91
-SIGNATURE_002	= 0x21
-
+SIGNATURE_000 = 0x1E
+SIGNATURE_001 = 0x92
+SIGNATURE_002 = 0x23
 
 
 ; ***** ABSOLUTE I/O REGISTER LOCATIONS **********************************
@@ -1504,6 +1501,29 @@ CCL_SEQSEL1_bm = (1<<1)             ; Sequential Selection bit 1 mask
 CCL_SEQSEL1_bp = 1                  ; Sequential Selection bit 1 position
 CCL_SEQSEL2_bm = (1<<2)             ; Sequential Selection bit 2 mask
 CCL_SEQSEL2_bp = 2                  ; Sequential Selection bit 2 position
+
+; CCL_TRUTH0 masks
+CCL_TRUTH_gm = 0xFF                 ; Truth Table group mask
+CCL_TRUTH_gp = 0                    ; Truth Table group position
+CCL_TRUTH0_bm = (1<<0)              ; Truth Table bit 0 mask
+CCL_TRUTH0_bp = 0                   ; Truth Table bit 0 position
+CCL_TRUTH1_bm = (1<<1)              ; Truth Table bit 1 mask
+CCL_TRUTH1_bp = 1                   ; Truth Table bit 1 position
+CCL_TRUTH2_bm = (1<<2)              ; Truth Table bit 2 mask
+CCL_TRUTH2_bp = 2                   ; Truth Table bit 2 position
+CCL_TRUTH3_bm = (1<<3)              ; Truth Table bit 3 mask
+CCL_TRUTH3_bp = 3                   ; Truth Table bit 3 position
+CCL_TRUTH4_bm = (1<<4)              ; Truth Table bit 4 mask
+CCL_TRUTH4_bp = 4                   ; Truth Table bit 4 position
+CCL_TRUTH5_bm = (1<<5)              ; Truth Table bit 5 mask
+CCL_TRUTH5_bp = 5                   ; Truth Table bit 5 position
+CCL_TRUTH6_bm = (1<<6)              ; Truth Table bit 6 mask
+CCL_TRUTH6_bp = 6                   ; Truth Table bit 6 position
+CCL_TRUTH7_bm = (1<<7)              ; Truth Table bit 7 mask
+CCL_TRUTH7_bp = 7                   ; Truth Table bit 7 position
+
+; CCL_TRUTH1 masks
+; Masks for CCL_TRUTH already defined
 
 ; Edge Detection Enable select
 CCL_EDGEDET_DIS_gc = (0x00<<7)      ; Edge detector is disabled
@@ -4274,12 +4294,12 @@ ZL	= 30
 
 
 DATAMEM_START = 0x0000
-DATAMEM_SIZE = 0x8800
-DATAMEM_END = (0x0000 + 0x8800 - 1)
+DATAMEM_SIZE = 0x9000
+DATAMEM_END = (0x0000 + 0x9000 - 1)
 
 EEPROM_START = 0x1400
-EEPROM_SIZE = 0x0040
-EEPROM_END = (0x1400 + 0x0040 - 1)
+EEPROM_SIZE = 0x0080
+EEPROM_END = (0x1400 + 0x0080 - 1)
 EEPROM_PAGE_SIZE = 0x20
 
 FUSES_START = 0x1280
@@ -4287,9 +4307,9 @@ FUSES_SIZE = 0x000A
 FUSES_END = (0x1280 + 0x000A - 1)
 FUSES_PAGE_SIZE = 0x20
 
-INTERNAL_SRAM_START = 0x3F80
-INTERNAL_SRAM_SIZE = 0x0080
-INTERNAL_SRAM_END = (0x3F80 + 0x0080 - 1)
+INTERNAL_SRAM_START = 0x3F00
+INTERNAL_SRAM_SIZE = 0x0100
+INTERNAL_SRAM_END = (0x3F00 + 0x0100 - 1)
 
 IO_START = 0x0000
 IO_SIZE = 0x1100
@@ -4301,8 +4321,8 @@ LOCKBITS_END = (0x128A + 0x0001 - 1)
 LOCKBITS_PAGE_SIZE = 0x20
 
 MAPPED_PROGMEM_START = 0x8000
-MAPPED_PROGMEM_SIZE = 0x0800
-MAPPED_PROGMEM_END = (0x8000 + 0x0800 - 1)
+MAPPED_PROGMEM_SIZE = 0x1000
+MAPPED_PROGMEM_END = (0x8000 + 0x1000 - 1)
 MAPPED_PROGMEM_PAGE_SIZE = 0x40
 
 PROD_SIGNATURES_START = 0x1103
@@ -4321,8 +4341,8 @@ USER_SIGNATURES_END = (0x1300 + 0x0020 - 1)
 USER_SIGNATURES_PAGE_SIZE = 0x20
 
 PROGMEM_START = 0x0000
-PROGMEM_SIZE = 0x0800
-PROGMEM_END = (0x0000 + 0x0800 - 1)
+PROGMEM_SIZE = 0x1000
+PROGMEM_END = (0x0000 + 0x1000 - 1)
 PROGMEM_PAGE_SIZE = 0x40
 
 
@@ -4482,7 +4502,6 @@ NVMCTRL_EE_voffset = 0
 
 
 INT_VECTORS_SIZE = 26 ; size in words
-
 
 
 ; ***** END OF FILE ******************************************************
