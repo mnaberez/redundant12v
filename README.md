@@ -36,6 +36,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[DC Extension Cable 18 AWG 12VDC 10A 33' Long](https://www.ebay.com/itm/133233779533) | 1 | Connectors cut off and discarded; used to make output cables and for wiring inside Project Box |
 |[10pc Dupont 2x2 Female Housing](https://www.ebay.com/itm/141510327734) | 1 | 1 housing used to make ERDN40 alarm cable |
 |[10pc Dupont 2-pin 26AWG Female-Female Jumper Cable](https://www.ebay.com/itm/254959908608) | 1 | 2 cables used to make ERDN40 alarm cable |
+|[Molex KK 22-01-3077 7-pin Housing](https://www.mouser.com/ProductDetail/538-22-01-3077)| 1 | 1 housing used for PCB connector |
 |[125pc Rubber Grommet Set](https://www.ebay.com/itm/221291687081) | 1 | 1 grommet used around wiring from ERDN40 into project box |
 |[TICONN 80pc Stainless Steel Hose Clamp Set](https://www.amazon.com/gp/product/B094YP2F3D) | 1 | 3 hose clamps used for AC cord strain relief |
 |[100pc 1/4" Aluminum Pop Rivet Set](https://www.harborfreight.com/100-piece-1-4-quarter-inch-aluminum-blind-rivet-set-67619.html) | 1 | 3 pop rivets used to secure hose clamps to shelf |
@@ -50,7 +51,6 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[ATTINY212-SSF](https://www.mouser.com/ProductDetail/579-ATTINY212-SSF) Microcontroller SOIC-8 | 1 | U1 |
 |[MAX232EID](https://www.mouser.com/ProductDetail/595-MAX232EID) TI RS232 Transceiver SOIC-8 | 1 | U2 |
 |[ECS-3951M-018-AU-TR](https://www.mouser.com/ProductDetail/520-3951M-018-AU) 1.8432 MHz Oscillator | 1 | X1 |
-|[SMMBT3904LT1G](https://www.mouser.com/ProductDetail/863-SMMBT3904LT1G) NPN Transistor | 2 | Q1, Q2 |
 |[BZX84-A15,215](https://www.mouser.com/ProductDetail/771-BZX84-A15,215) 15V Zener Diode | 1 | D1 |
 |[F1206B1R00FSTR](https://www.mouser.com/ProductDetail/581-F1206B1R00FSTR) Fuse 1206 | 1 | F1 |
 |[08055C104J4T2A](https://www.mouser.com/ProductDetail/581-08055C104J4T2A) Capacitor 0.1uF 50V 0805 | 4 | C1, C2, C4, C8 |
@@ -60,7 +60,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[ERJ-P06F1500V](https://www.mouser.com/ProductDetail/667-ERJ-P06F1500V) 150ohm Resistor 0805 | 2 | R3, R4 (choose 150, 200, or 220 ohm) |
 |[ERJ-P06F2000V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2000V) 200ohm Resistor 0805 | 2 | R3, R4 |
 |[ERJ-P06F2200V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2200V) 220ohm Resistor 0805 | 2 | R3, R4 |
-|[22-12-2064](https://www.mouser.com/ProductDetail/538-22-12-2064) Molex KK 6-pin Right Angle | 1 | J1 |
+|[22-12-2074](https://www.mouser.com/ProductDetail/538-22-12-2074) Molex KK 7-pin Right Angle | 1 | J1 |
 |[IDC 2x5 Header](https://www.ebay.com/itm/254517739367) Shrouded Through Hole | 1 | J2 |
 
 ## Author
