@@ -2,8 +2,8 @@
 ;1 VCC
 ;2 PA6 TX to MAX232
 ;3 PA7 RX from MAX232
-;4 PA1 Digital Input: Power Supply 0 status (0=fail, 1=ok)
-;5 PA2 Digital Input: Power Supply 1 status (0=fail, 1=ok)
+;4 PA1 Digital Input: Power Supply 0 failed (0=ok, 1=failed)
+;5 PA2 Digital Input: Power Supply 1 failed (0=ok, 1=failed)
 ;6 UPDI
 ;7 EXTCLK (from 1.8432 MHz oscillator)
 ;8 GND
@@ -74,10 +74,10 @@ main_loop:
 
 ;Check power supplies 0 and 1
 ;Blocks for at least 25ms to debounce
-;Returns R16 = Bitfield of power supply "ok" statuses
+;Returns R16 = Bitfield of power supply failed statuses
 ;              Bit 7..2 Unused
-;              Bit    1 Power Supply 1
-;              Bit    0 Power Supply 0
+;              Bit    1 Power Supply 1 failed (0=ok, 1=failed)
+;              Bit    0 Power Supply 0 failed (0=ok, 1=failed)
 ;Destroys R16,R17,R18
 check_supplies:
     ldi r18, 25             ;Debounce: PORTA must be the same for N readings
@@ -121,7 +121,7 @@ send_status_line:
     rjmp uart_send_crlf
 
 ;Send "PSn=OK" or "PSn=FAIL"
-;Call with R16=status in bit 0 (0=fail, 1=ok)
+;Call with R16=failed status in bit 0 (0=ok, 1=failed)
 ;          R17=power supply number in ASCII ('0' or '1')
 send_ps_status:
     push r16              ;Push status in bit 0
@@ -135,16 +135,16 @@ send_ps_status:
     rcall uart_send_byte
 
     pop r16               ;Pop status in bit 0
-    sbrc r16, 0           ;Skip branch if bit 0 is clear (supply failed)
-    breq 1$               ;Branch to show OK
+    sbrc r16, 0           ;Skip branch if bit 0 is clear (clear = supply is ok)
+    breq 1$               ;Branch to show failed
 
-    ldi ZL, <(equals_fail * 2)
-    ldi ZH, >(equals_fail * 2)
-    rjmp uart_send_str    ;Send "=FAIL"
-
-1$: ldi ZL, <(equals_ok * 2)
+    ldi ZL, <(equals_ok * 2)
     ldi ZH, >(equals_ok * 2)
     rjmp uart_send_str    ;Send "=OK"
+
+1$: ldi ZL, <(equals_fail * 2)
+    ldi ZH, >(equals_fail * 2)
+    rjmp uart_send_str    ;Send "=FAIL"
 
 .nval ps,.
     .ascii "PS"
