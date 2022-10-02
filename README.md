@@ -31,6 +31,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[L-Com SDG400XS D-Sub 50pc Jackscrew/Washer/Nut](https://www.newark.com/l-com/sdg400xs/jack-screw-4-40-10-16mm/dp/63K2685) | 1 | [Datasheet](https://web.archive.org/web/20220827230745/https://www.l-com.com/Images/Downloadables/2D/SDG450XS_2D.pdf).  2 jackscrews, 2 lock washers, and 2 hex nuts used to mount DB9 to project box. |
 |[DB9 Male/Female 5' Cable](https://www.mouser.com/ProductDetail/523-CS-DSDMDB09MF005) | 1 | [Datasheet](https://web.archive.org/web/20220719155819/https://www.mouser.com/datasheet/2/18/1/CS_DSDMDB09MF-2079775.pdf).  For direct connection between the box and a PC with a DB9 serial port. |
 |[FTDI-US232R-100 1m USB-Serial Cable](https://www.mouser.com/ProductDetail/895-US232R-100-BLK) | 1 | [Datasheet](https://web.archive.org/web/20220828230546/https://www.mouser.com/datasheet/2/163/DS_US232R-10_R-100-500-1669828.pdf).  For connecting to a PC without a DB9 serial port, use this adapter together with the above DB9 cable. |
+|[Lumex SSI-LXH387GD Panel Mount Green LED](https://www.mouser.com/ProductDetail/696-SSI-LXH387GD) | 2 | [Datasheet](https://web.archive.org/web/20221002231549/https://www.mouser.com/datasheet/2/244/LUMX_S_A0001762456_1-2551886.pdf).  Mounted on project box to show the "on" status of each power supply.
 |[Switchcraft L712ASH 2.5mm Locking Barrel Socket](https://www.mouser.com/ProductDetail/502-L712ASH) | 5 | [Datasheet](https://web.archive.org/web/20220407035419/https://www.mouser.com/datasheet/2/393/L712ASH-L722ASH_CD-1110860.pdf), [Bulletin](https://web.archive.org/web/20220407164041/https://www.switchcraft.com/Documents/switchcraft_npb_637_high_temp_jacks_plugs.pdf).  Mounted on project box for DC outputs. |
 |[Switchcraft 761KSH15 2.5mm Locking Barrel Plug](https://www.mouser.com/ProductDetail/502-761KSH15) | 5 | [Datasheet](https://web.archive.org/web/20220407035117/https://www.mouser.com/datasheet/2/393/761KSH-S761KSH_CD-1110850.pdf). See bulletin above for electrical info.  For building DC cables out to devices. |
 |[14 AWG GXL Wire 10' Long](https://www.ebay.com/itm/293094627307) | 3 | 1 each: red, green, black.  Cut to length for high current DC wiring |
@@ -58,9 +59,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[08053C105K4Z4A](https://www.mouser.com/ProductDetail/581-08053C105K4Z4A) 1uF 25V Capacitor 0805 | 4 | C3, C5, C6, C7 |
 |[CGA4J1X7S1E106K125AC](https://www.mouser.com/ProductDetail/810-CGA4J1X7S1E106K1) Capacitor 10uF 25V 0805 | 1 | C9 |
 |[AC0805FR-7W10KL](https://www.mouser.com/ProductDetail/603-AC0805FR-7W10KL) 10K Resistor 0805 | 2 | R1, R2 |
-|[ERJ-P06F1500V](https://www.mouser.com/ProductDetail/667-ERJ-P06F1500V) 150ohm Resistor 0805 | 2 | R3, R4 (choose 150, 200, or 220 ohm) |
 |[ERJ-P06F2000V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2000V) 200ohm Resistor 0805 | 2 | R3, R4 |
-|[ERJ-P06F2200V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2200V) 220ohm Resistor 0805 | 2 | R3, R4 |
 |[22-12-2074](https://www.mouser.com/ProductDetail/538-22-12-2074) Molex KK 7-pin Right Angle | 1 | J1 |
 |[IDC 2x5 Header](https://www.ebay.com/itm/254517739367) Shrouded Through Hole | 1 | J2 |
 
