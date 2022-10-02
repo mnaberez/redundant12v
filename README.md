@@ -52,14 +52,14 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |------|-----|-----------------------|
 |[ATTINY212-SSF](https://www.mouser.com/ProductDetail/579-ATTINY212-SSF) Microcontroller SOIC-8 | 1 | U1 |
 |[MAX232EID](https://www.mouser.com/ProductDetail/595-MAX232EID) TI RS232 Transceiver SOIC-8 | 1 | U2 |
-|[ECS-3951M-018-AU-TR](https://www.mouser.com/ProductDetail/520-3951M-018-AU) 1.8432 MHz Oscillator | 1 | X1 |
-|[BZX84-A15,215](https://www.mouser.com/ProductDetail/771-BZX84-A15,215) 15V Zener Diode | 1 | D1 |
+|[ECS-3951M-018-AU-TR](https://www.mouser.com/ProductDetail/520-3951M-018-AU) Oscillator 1.8432 MHz | 1 | X1 |
+|[BZX84-A15,215](https://www.mouser.com/ProductDetail/771-BZX84-A15,215) Zener Diode 15V | 1 | D1 |
 |[F1206B1R00FSTR](https://www.mouser.com/ProductDetail/581-F1206B1R00FSTR) Fuse 1206 | 1 | F1 |
 |[08055C104J4T2A](https://www.mouser.com/ProductDetail/581-08055C104J4T2A) Capacitor 0.1uF 50V 0805 | 4 | C1, C2, C4, C8 |
-|[08053C105K4Z4A](https://www.mouser.com/ProductDetail/581-08053C105K4Z4A) 1uF 25V Capacitor 0805 | 4 | C3, C5, C6, C7 |
+|[08053C105K4Z4A](https://www.mouser.com/ProductDetail/581-08053C105K4Z4A) Capacitor 1uF 25V 0805 | 4 | C3, C5, C6, C7 |
 |[CGA4J1X7S1E106K125AC](https://www.mouser.com/ProductDetail/810-CGA4J1X7S1E106K1) Capacitor 10uF 25V 0805 | 1 | C9 |
-|[AC0805FR-7W10KL](https://www.mouser.com/ProductDetail/603-AC0805FR-7W10KL) 10K Resistor 0805 | 2 | R1, R2 |
-|[ERJ-P06F2000V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2000V) 200ohm Resistor 0805 | 2 | R3, R4 |
+|[RK73H2ARTTD4702F](https://www.mouser.com/ProductDetail/660-RK73H2ARTTD4702F) Resistor 47K 0805 | 2 | R1, R2 |
+|[ERJ-P06F2000V](https://www.mouser.com/ProductDetail/667-ERJ-P06F2000V) Resistor 200ohm  0805 | 2 | R3, R4 |
 |[22-12-2074](https://www.mouser.com/ProductDetail/538-22-12-2074) Molex KK 7-pin Right Angle | 1 | J1 |
 |[IDC 2x5 Header](https://www.ebay.com/itm/254517739367) Shrouded Through Hole | 1 | J2 |
 

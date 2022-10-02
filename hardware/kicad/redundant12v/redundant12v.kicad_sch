@@ -2335,7 +2335,7 @@
     (in_bom yes) (on_board yes)
     (uuid ce21a548-d04b-4c0a-9ef4-b913d9d19def)
     (property "Reference" "R2" (id 0) (at 46.99 115.57 90))
-    (property "Value" "10K" (id 1) (at 46.99 110.49 90))
+    (property "Value" "47K" (id 1) (at 46.99 110.49 90))
     (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (id 2) (at 44.45 113.03 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -2384,7 +2384,7 @@
     (property "Reference" "R1" (id 0) (at 46.99 86.36 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "10K" (id 1) (at 46.99 82.55 90)
+    (property "Value" "47K" (id 1) (at 46.99 82.55 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (id 2) (at 44.45 82.55 0)
@@ -2568,10 +2568,10 @@
       (reference "J2") (unit 1) (value "IDC 2x5 Male") (footprint "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical")
     )
     (path "/da76e409-da8b-42c9-938b-4b030245eb99"
-      (reference "R1") (unit 1) (value "10K") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+      (reference "R1") (unit 1) (value "47K") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
     )
     (path "/ce21a548-d04b-4c0a-9ef4-b913d9d19def"
-      (reference "R2") (unit 1) (value "10K") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+      (reference "R2") (unit 1) (value "47K") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
     )
     (path "/de0a58e5-7f3d-4ccf-ac8a-4cd50321ae36"
       (reference "R3") (unit 1) (value "150") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
