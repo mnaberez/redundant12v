@@ -40,6 +40,8 @@ Flashing requires:
 
 Run `make program` to flash the MCU.  This will completely program a blank part so that it is ready to use.
 
+The [Adafruit SWD Breakout Board](https://www.adafruit.com/product/2743) can be used to connect the Atmel-ICE to the test points on the bottom of the PCB.  The ribbon cable plugs into the "AVR" port on the Atmel-ICE.  The connections from the breakout board to the test points are: GNDd → GND, KEY → VTG, NC → UPDI.  See this [photo of the connections](../hardware/photos/updi.jpg).
+
 ## Test
 
 [Minicom](https://salsa.debian.org/minicom-team/minicom/) can be used to test:
