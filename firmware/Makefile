@@ -27,9 +27,10 @@ program: $(PROJECT_FLASH).hex $(PROJECT_FUSES).hex
 	avrdude $(ISPFLAGS) -p $(MCU) -e -U flash:w:$(PROJECT_FLASH).hex:i -U fuses:w:$(PROJECT_FUSES).hex:i
 
 $(PROJECT_FLASH).hex: main.asm
+	# add -i ".list" before -i ".include '$(DEFSFILE)'" to see it in the listing output
 	asavr -l -p -w -i ".include '$(DEFSFILE)'" -o $(PROJECT_FLASH) main.asm
 	aslink -i $(PROJECT_FLASH)
-	# add crc16 (requires srecord 1.64 or later)
+	# srec_cat adds crc16 (requires srecord 1.64 or later)
 	srec_cat $(PROJECT_FLASH).ihx -intel -CRC16_Big_Endian $(CRC16ADDR) -broken -o $(PROJECT_FLASH).hex -intel -line-length=76 -crlf
 	rm $(PROJECT_FLASH).hlr $(PROJECT_FLASH).ihx $(PROJECT_FLASH).rel
 
