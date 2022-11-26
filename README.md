@@ -1,5 +1,8 @@
 # Rackmount Redundant 12V Power Supply
 
+[![Photo](./hardware/photos/supply-small.jpg)](./hardware/photos/supply-large.jpg)
+
+
 This is a redundant, but not hot-swappable, 12VDC power supply.  It has these features:
 
  - Two AC cords.  Either cord can lose AC power without disrupting the 12VDC output.
