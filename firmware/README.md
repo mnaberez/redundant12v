@@ -1,5 +1,7 @@
 # Firmware
 
+[![Photo](../hardware/photos/pcb-small.jpg)](../hardware/photos/pcb-large.jpg)
+
 The firmware runs on an [Attiny212 or Attiny412](https://web.archive.org/web/20220715022600/https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny212-14-412-14-Automotive-DS40002229A.pdf).  It configures the UART for 9600-N81 and then waits for a carriage return (`\r`).  Anything else is ignored.  When a `\r` is received, a status line ending with `\r\n` is printed:
 
 ```
