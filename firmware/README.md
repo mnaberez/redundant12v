@@ -1,6 +1,6 @@
 # Firmware
 
-The firmware runs on an [Attiny212 or Attiny412](https://web.archive.org/web/20220715022600/https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny212-14-412-14-Automotive-DS40002229A.pdf).  It configures the UART for 9600-N81 and then waits for a carriage return (`\r`).  Anything else is ignored.  When a `\r` is received, a status line ending with `\r\n` is printed:
+The firmware runs on an [Attiny212 or Attiny412](https://web.archive.org/web/20220715022600if_/https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny212-14-412-14-Automotive-DS40002229A.pdf).  It configures the UART for 9600-N81 and then waits for a carriage return (`\r`).  Anything else is ignored.  When a `\r` is received, a status line ending with `\r\n` is printed:
 
 ```
 PS0=OK,PS1=FAIL
@@ -54,5 +54,5 @@ The status line should be displayed when the enter key is pressed.
 
 ## References
 
-- [Attiny212 / Attiny412 Datasheet](https://web.archive.org/web/20220715022600/https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny212-14-412-14-Automotive-DS40002229A.pdf)
-- [AVR Instruction Set Manual](https://web.archive.org/web/20211122051203/http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf)
+- [Attiny212 / Attiny412 Datasheet](https://web.archive.org/web/20220715022600if_/https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATtiny212-14-412-14-Automotive-DS40002229A.pdf)
+- [AVR Instruction Set Manual](https://web.archive.org/web/20211122051203if_/http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf)
