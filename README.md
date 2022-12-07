@@ -40,6 +40,7 @@ Rackmount [Automatic Transfer Switches](https://web.archive.org/web/202204081347
 |[Switchcraft L712ASH 2.5mm Locking Barrel Socket](https://www.mouser.com/ProductDetail/502-L712ASH) | 5 | [Datasheet](https://web.archive.org/web/20220407035419if_/https://www.mouser.com/datasheet/2/393/L712ASH-L722ASH_CD-1110860.pdf), [Bulletin](https://web.archive.org/web/20220407164041if_/https://www.switchcraft.com/Documents/switchcraft_npb_637_high_temp_jacks_plugs.pdf).  Mounted on project box for DC outputs. |
 |[Switchcraft 761KSH15 2.5mm Locking Barrel Plug](https://www.mouser.com/ProductDetail/502-761KSH15) | 5 | [Datasheet](https://web.archive.org/web/20220407035117if_/https://www.mouser.com/datasheet/2/393/761KSH-S761KSH_CD-1110850.pdf). See bulletin above for electrical info.  For building DC cables out to devices. |
 |[14 AWG GXL Wire 10' Long](https://www.ebay.com/itm/293094627307) | 3 | 1 each: red, green, black.  Cut to length for high current DC wiring |
+|[1200Pcs Assorted Crimp Terminals](https://www.ebay.com/itm/172856488315) | 1 | 21 M4 size ring connectors used with terminal blocks on Meanwell units |
 |[DC Extension Cable 18 AWG 12VDC 10A 33' Long](https://www.ebay.com/itm/133233779533) | 1 | Connectors cut off and discarded; used to make output cables and for wiring inside Project Box |
 |[10pc Dupont 2x2 Female Housing](https://www.ebay.com/itm/141510327734) | 1 | 1 housing used to make ERDN40 alarm cable |
 |[10pc Dupont 2-pin 26AWG Female-Female Jumper Cable](https://www.ebay.com/itm/254959908608) | 1 | 2 cables used to make ERDN40 alarm cable |
