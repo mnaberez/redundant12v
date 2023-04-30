@@ -2,3 +2,4 @@ firmware/redundant12v_*_flash*
 firmware/redundant12v_*_fuses*
 *-backups/
 fp-info-cache
+*.kicad_prl
