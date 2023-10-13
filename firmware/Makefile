@@ -28,14 +28,14 @@ program: $(PROJECT_FLASH).hex $(PROJECT_FUSES).hex
 
 $(PROJECT_FLASH).hex: main.asm
 	# add -i ".list" before -i ".include '$(DEFSFILE)'" to see it in the listing output
-	asavr -l -p -w -i ".include '$(DEFSFILE)'" -o $(PROJECT_FLASH) main.asm
+	asavr -l -p -w -i ".include '$(DEFSFILE)'" -o+$(PROJECT_FLASH) main.asm
 	aslink -i $(PROJECT_FLASH)
 	# srec_cat adds crc16 (requires srecord 1.64 or later)
-	srec_cat $(PROJECT_FLASH).ihx -intel -CRC16_Big_Endian $(CRC16ADDR) -broken -o $(PROJECT_FLASH).hex -intel -line-length=76 -crlf
-	rm $(PROJECT_FLASH).hlr $(PROJECT_FLASH).ihx $(PROJECT_FLASH).rel
+	srec_cat $(PROJECT_FLASH).hex -intel -CRC16_Big_Endian $(CRC16ADDR) -broken -o $(PROJECT_FLASH).hex.srec_cat -intel -line-length=76 -crlf
+	mv $(PROJECT_FLASH).hex.srec_cat $(PROJECT_FLASH).hex
+	rm $(PROJECT_FLASH).hlr $(PROJECT_FLASH).rel
 
 $(PROJECT_FUSES).hex: fuses.asm
-	asavr -l -p -w -i ".include '$(DEFSFILE)'" -o $(PROJECT_FUSES) fuses.asm
+	asavr -l -p -w -i ".include '$(DEFSFILE)'" -o+$(PROJECT_FUSES) fuses.asm
 	aslink -i $(PROJECT_FUSES)
-	mv $(PROJECT_FUSES).ihx $(PROJECT_FUSES).hex
 	rm $(PROJECT_FUSES).hlr $(PROJECT_FUSES).rel
