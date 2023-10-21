@@ -1,5 +1,5 @@
 
-;Definitions file "tn212.def.asm" or "tn412.def.asm" 
+;Definitions file "tn212def.asm" or "tn412def.asm" 
 ;will be included first by the Makefile.
 
 .area fuses (abs, dseg)

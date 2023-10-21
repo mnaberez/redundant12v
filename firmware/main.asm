@@ -8,7 +8,7 @@
 ;7 EXTCLK (from 1.8432 MHz oscillator)
 ;8 GND
 
-    ;Definitions file "tn212.def.asm" or "tn412.def.asm"
+    ;Definitions file "tn212def.asm" or "tn412def.asm"
     ;will be included first by the Makefile.
 
     .area code (abs)
@@ -114,7 +114,7 @@ send_status_line:
     rcall uart_send_byte
 
     pop r16                 ;Pop supplies bitfield
-    lsr r16                 ;Rotate bit 0 (supply 1 status) into bit 0
+    lsr r16                 ;Rotate bit 1 (supply 1 status) into bit 0
     ldi r17, '1             ;Supply number to display in ASCII = '1'
     rcall send_ps_status
 
